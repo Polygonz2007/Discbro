@@ -32,6 +32,10 @@ wss.on('connection', (ws) => {
         data = isBinary ? data : data.toString();
         data = JSON.parse(data);
 
+        // Handle missing data
+        if (data.author == "")
+            data.author = "Anonymous User"
+
         // Handle incoming message
         const time = new Date().toLocaleString();
 

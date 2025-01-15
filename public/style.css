@@ -1,12 +1,124 @@
+
+/** Preferences **/
+:root {
+    /* Dimensions */
+    --sidebar-width: 24rem;
+    --message-bar-height: 3rem;
+
+    /* Text */
+    --text-font: "Consolas";
+    --text-size: 1rem;
+
+    /* Colors */
+    --background-color: #123;
+    --pop-color: #345;
+    --bar-color: #234;
+    --text-color: #FFF;
+    --light-text-color: #FFFE;
+    --weak-text-color: #FFF7;
+}
+
+
+
+
+
+
+/** Styles **/
+body {
+    font-family: var(--text-font);
+    font-size: var(--text-size);
+    color: var(--text-color);
+    background-color: var(--bar-color);
+}
+
+input {
+    font-family: var(--text-size);
+    font-size: var(--text-size);
+    color: var(--text-color);
+
+    box-sizing: border-box;
+    padding: 0 var(--text-size);
+    height: calc(var(--text-size) + 1rem);
+
+    border: none;
+    border-radius: 0;
+    background-color: var(--pop-color);
+}
+
 p {
-    margin: 0.1em;
+    margin: 0;
+    margin-top: 0.3rem;
 }
 
-.messages {
-    width: 48em;
-    height: 96em;
+#viewer {
+    position: absolute;
+    width: calc(100vw - var(--sidebar-width));
+    height: 100vh;
+
+    top: 0;
+    right: 0;
+    overflow: hidden;
+
+    background-color: var(--background-color);
 }
 
-.messages > div {
-    margin-top: 0.4em;
+#messages {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - var(--message-bar-height));
+
+    box-sizing: border-box;
+    padding: 0.6rem;
+
+    top: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
+
+#messages > div {
+    padding: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.author {
+    display: inline-block;
+    padding-right: 0.1rem;
+    font-weight: bold;
+}
+
+.timestamp {
+    display: inline-block;
+    padding-left: 0.1rem;
+    color: var(--weak-text-color);
+}
+
+.message {
+    color: var(--light-text-color);
+}
+
+.message:hover {
+    background-color: var(--pop-color);
+}
+
+#message-bar {
+    position: absolute;
+    width: 100%;
+    height: var(--message-bar-height);
+
+    bottom: 0;
+
+    background-color: var(--pop-color);
+    outline: none;
+}
+
+.highlight {
+    background-color: #AA57;
+}
+
+
+/* For mobile devices */
+@media all and (min-width:0px) and (max-width: 500px) {
+    :root {
+        --sidebar-width: 0;
+    }
+  }
