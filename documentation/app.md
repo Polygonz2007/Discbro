@@ -4,7 +4,8 @@ Here is the main documentation page for Discbro.
 ## Discbro
 Discbro is a messaging app similar to Discord, which allows users to create an account, add friends, chat directly with friends, create message groups...
 
-It works using SQLite3 as the database, Express.js as the server, bcrypt as the hasher, and WebSockets to almost instantaniously send messages between users.
+It works using SQLite3 as the database, Express.js as the server, bcrypt as the hasher, and WebSockets (ws) to almost instantaniously send messages between users.
+The packages will be checked for vulnerabilities.
 
 
 
