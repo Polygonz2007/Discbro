@@ -26,24 +26,20 @@ let messages = [
 
 wss.on('connection', (ws) => {
     connections.push(ws);
-
     ws.send(JSON.stringify(messages)); // send history
     
     ws.on('message', (data, isBinary) => {
         data = isBinary ? data : data.toString();
-        data.split("\n");
-
-        const content = data[0];
-        const author = data[1];
+        data = JSON.parse(data);
 
         // Handle incoming message
         const time = new Date().toLocaleString();
 
-        const result = { "author": author, "time": time, "content": content };
+        const result = { "author": data.author, "time": time, "content": data.content };
 
         messages.push(result);
         for (let i = 0; i < connections.length; i++) {
-            ws.send(JSON.stringify(result));
+            connections[i].send(JSON.stringify([result]));
         }
     });
 

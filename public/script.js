@@ -43,7 +43,7 @@ function addMessage(data) {
 
 function sendMessage(content, author) {
 	const data = { "content": content, "author": author };
-	const to_send = data.content + "\n" + data.author;
+	const send = JSON.stringify(data);
 
-	socket.send(to_send);
+	socket.send(send);
 }
