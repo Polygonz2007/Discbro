@@ -19,17 +19,31 @@ const public_path = path.join(__dirname, "public");
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: config.port.websocket });
 
-let number = 0;
 let connections = [];
+let messages = [
+    { author: "System", time: "2013", content: "Welcome to Discbro! Be nice pls :)" }
+]
 
 wss.on('connection', (ws) => {
     connections.push(ws);
-        
-    ws.on('message', (message) => {
+
+    ws.send(JSON.stringify(messages)); // send history
+    
+    ws.on('message', (data, isBinary) => {
+        data = isBinary ? data : data.toString();
+        data.split("\n");
+
+        const content = data[0];
+        const author = data[1];
+
         // Handle incoming message
-        number++;
+        const time = new Date().toLocaleString();
+
+        const result = { "author": author, "time": time, "content": content };
+
+        messages.push(result);
         for (let i = 0; i < connections.length; i++) {
-            connections[i].send(number);
+            ws.send(JSON.stringify(result));
         }
     });
 

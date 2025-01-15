@@ -1,0 +1,12 @@
+p {
+    margin: 0.1em;
+}
+
+.messages {
+    width: 48em;
+    height: 96em;
+}
+
+.messages > div {
+    margin-top: 0.4em;
+}

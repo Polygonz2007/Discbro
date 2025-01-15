@@ -3,28 +3,47 @@ const port = 2337; // port used for WebSocket
 const doc = document;
 const socket = new WebSocket('ws://127.0.0.1:' + port);
 
-let button = doc.querySelector("#button");
-let counter = doc.querySelector("h3");
+let message_field = doc.querySelector("#message");
+let author_field = doc.querySelector("#author");
+let send_btn = doc.querySelector("#send");
+
+let messages = doc.querySelector("#messages");
+
 
 socket.onopen = (event) => {
-    // Handle connection open
-    sendMessage(JSON.stringify({"userid": 123}));
+	// Handle connection open
+	send_btn.addEventListener("click", () => {
+		const content = message_field.value;
+		const author = author_field.value;
 
-    button.addEventListener("click", () => {
-        sendMessage(JSON.stringify({"+": "1"}));
-    });
+		sendMessage(content, author);
+	});
 };
 
 socket.onmessage = (event) => {
-  // Handle received message
-   counter.innerText = "Count: " + event.data;
+	// Handle received message
+	const data = JSON.parse(event.data);
+
+	for (let i = 0; i < data.length; i++) {
+		addMessage(data[i]); // Loop, when multiple messages arrive at once (at start)
+	}
 };
 
 socket.onclose = (event) => {
-  // Handle connection close
-  clickEvent = null;
+	// Handle connection close
 };
 
-function sendMessage(message) {
-  socket.send(message);
+function addMessage(data) {
+	// Remove any HTML-esque stuff that could be scary
+
+
+	// Write into messages div
+	messages.innerHTML += `<div><p><b>${data.author}</b> - ${data.time}</p><p>${data.content}</p></div>`;
+}
+
+function sendMessage(content, author) {
+	const data = { "content": content, "author": author };
+	const to_send = data.content + "\n" + data.author;
+
+	socket.send(to_send);
 }
