@@ -4,7 +4,7 @@ const load_amount = 50; // amount of messages to load on scroll
 
 const doc = document;
 let root = doc.querySelector(":root");
-const socket = new WebSocket('ws://10.20.8.170:' + port);
+const socket = new WebSocket('ws://127.0.0.1:' + port);
 
 // Selecting theme
 let checkboxes = doc.querySelectorAll("#theme-select > li > input");
