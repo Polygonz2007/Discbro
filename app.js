@@ -21,7 +21,7 @@ const wss = new WebSocket.Server({ port: config.port.websocket });
 
 let connections = [];
 let messages = [
-    { author: "System", time: "2013", content: "Welcome to Discbro! Be nice pls :)" }
+    { author: "System", time: "", content: "Welcome to Discbro! Be nice pls :)" }
 ]
 
 wss.on('connection', (ws) => {
@@ -34,7 +34,7 @@ wss.on('connection', (ws) => {
 
         // Handle missing data
         if (data.author == "")
-            data.author = "Anonymous User"
+            data.author = "Anonymous User";
 
         // Sanetize
         data.author = escapeHTML(data.author);

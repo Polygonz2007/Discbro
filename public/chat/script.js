@@ -10,6 +10,10 @@ const socket = new WebSocket('ws://127.0.0.1:' + port);
 let checkboxes = doc.querySelectorAll("#theme-select > li > input");
 
 checkboxes.forEach((checkbox) => {
+	// Set default theme
+	if (checkbox.checked)
+		root.setAttribute("theme", checkbox.id);
+
 	checkbox.addEventListener("change", () => {
 		// Only for the active one
 		if (!checkbox.checked)

@@ -1,168 +1,47 @@
-
-/** Preferences **/
-:root { /* Default theme: dark */
-    /* Dimensions */
-    --sidebar-width: 24rem;
-    --message-bar-height: 3rem;
-
-    /* Text */
-    --text-font: "Consolas", "Roboto Mono";
-    --text-size: 1rem;
-    --text-size-small: 0.8rem;
-
-    /* Colors */
-    --background-color: #123; /* 123 */
-    --pop-color: #345; /* 345 */
-    --bar-color: #234; /* 234 */
-
-    --text-color: #FFF;
-    --light-text-color: #FFFE;
-    --weak-text-color: #FFF7;
-
-    --highlight-color: #AA57;
-}
-
-:root[theme=console] {
-    --background-color: #000; /* 123 */
-    --pop-color: #222; /* 345 */
-    --bar-color: #111; /* 234 */
-    
-    --text-color: #0F0;
-    --light-text-color: #0F0E;
-    --weak-text-color: #0F07;
-
-    --highlight-color: #2A27;
-}
-
-:root[theme=light] {
-    --background-color: #DDD; /* 123 */
-    --pop-color: #FFF; /* 345 */
-    --bar-color: #EEE; /* 234 */
-
-    --text-color: #000;
-    --light-text-color: #000E;
-    --weak-text-color: #0007;
-
-    --highlight-color: #DD37;
-}
-
-
-
-
-
-
-/** Styles **/
 body {
-    font-family: var(--text-font);
-    font-size: var(--text-size);
-    color: var(--text-color);
+    margin: 2vh 12vw;
     background-color: var(--bar-color);
-}
-
-/* Transistions for themes */
-* {
-    transition-property: background-color, color;
-    transition-duration: 0.27s;
-    transition-timing-function: ease-out;
-}
-
-input {
-    font-family: var(--text-size);
-    font-size: var(--text-size);
     color: var(--text-color);
 
-    box-sizing: border-box;
-    padding: 0 var(--text-size);
-    height: calc(var(--text-size) + 1rem);
+    font-family: var(--text-font);
 
-    border: none;
-    border-radius: 0;
-    background-color: var(--pop-color);
+    justify-content: center;
+    align-items: center;
+}
+
+img {
+    height: 10rem;
+    width: 76vw;
+}
+
+h1 {
+    text-align: center;
+    font-size: var(--text-title-size);
+}
+
+h3 {
+    text-align: center;
+    font-size: var(--text-subtitle-size);
 }
 
 p {
-    margin: 0;
-    padding: 0.15rem;
+    text-align: center;
 }
 
-#viewer {
-    position: absolute;
-    width: calc(100vw - var(--sidebar-width));
-    height: 100vh;
-
-    top: 0;
-    right: 0;
-    overflow: hidden;
-
-    background-color: var(--background-color);
+a {
+    color: var(--link-text-color);
 }
 
-#messages {
-    position: absolute;
-    width: 100%;
-    height: calc(100% - var(--message-bar-height));
-
-    box-sizing: border-box;
-    padding: 0.6rem;
-
-    top: 0;
-    overflow-y: scroll;
-    overflow-x: hidden;
+#logo {
+    margin-top: 9vh;
 }
 
-#messages > div {
-    padding: 0.4rem;
-    margin-top: 0.5rem;
+#subtitle {
+    margin-top: 7vh;
 }
 
-.author {
-    display: inline-block;
-    padding-right: 0.1rem;
-    font-weight: bold;
-}
-
-.timestamp {
-    display: inline-block;
-    padding-left: 0.1rem;
-    color: var(--weak-text-color);
-    font-size: var(--text-size-small);
-}
-
-.message {
-    color: var(--light-text-color);
-}
-
-.message:hover {
-    background-color: var(--pop-color);
-}
-
-#message-bar {
-    position: absolute;
-    width: 100%;
-    height: var(--message-bar-height);
-
-    bottom: 0;
-
-    background-color: var(--pop-color);
-    outline: none;
-}
-
-.highlight {
-    background-color: var(--highlight-color);
-}
-
-
-/* For mobile devices */
 @media all and (min-width:0px) and (max-width: 500px) {
     :root {
-        --sidebar-width: 0;
+        zoom: 75%;
     }
-  }
-
-img {
-    width: 24em;
-}
-
-input[type=checkbox] {
-    height: 1rem;
 }
