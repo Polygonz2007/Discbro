@@ -1,8 +1,31 @@
 const port = 2337; // port used for WebSocket
+const load_new_dist = 200; // distance to top to load old messages
+const load_amount = 50; // amount of messages to load on scroll
 
 const doc = document;
-const socket = new WebSocket('ws://10.0.0.5:' + port);
+let root = doc.querySelector(":root");
+const socket = new WebSocket('ws://10.20.8.170:' + port);
 
+// Selecting theme
+let checkboxes = doc.querySelectorAll("#theme-select > li > input");
+
+checkboxes.forEach((checkbox) => {
+	checkbox.addEventListener("change", () => {
+		// Only for the active one
+		if (!checkbox.checked)
+			return;
+
+		root.setAttribute("theme", checkbox.id);
+
+		// Uncheck others
+		checkboxes.forEach((des) => {
+			if (des != checkbox)
+				des.checked = false;
+		});
+	});
+});
+
+// Sending messages
 let message_field = doc.querySelector("#message-bar");
 let author_field = doc.querySelector("#author");
 
@@ -76,3 +99,7 @@ function sendMessage() {
 	// Clear box
 	message_field.value = "";
 }
+
+messages.addEventListener("scroll", () => {
+	console.log(messages.scrollTop);
+})

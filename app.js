@@ -36,12 +36,23 @@ wss.on('connection', (ws) => {
         if (data.author == "")
             data.author = "Anonymous User"
 
+        // Sanetize
+        data.author = escapeHTML(data.author);
+        data.content = escapeHTML(data.content);
+
+        // Find media links and insert media stuff
+        
+
         // Handle incoming message
         const time = new Date().toLocaleString();
 
         const result = { "author": data.author, "time": time, "content": data.content };
 
         messages.push(result);
+
+        if (messages.length > 100)
+            messages.splice(0, 1);
+
         for (let i = 0; i < connections.length; i++) {
             connections[i].send(JSON.stringify([result]));
         }
@@ -51,6 +62,27 @@ wss.on('connection', (ws) => {
         // Handle connection close
     });
 });
+
+function escapeHTML(str) {
+    return str.replace(/[&<>"'\/]/g, (char) => {
+        switch (char) {
+        case '&':
+            return '&amp;';
+        case '<':
+            return '&lt;';
+        case '>':
+            return '&gt;';
+        case '"':
+            return '&quot;';
+        case '\\':
+            return '&#39;';
+        case '/':
+            return '&#x2F;';
+        default:
+            return char;
+        }
+    });
+}
 
 // Start server
 app.use(express.static(public_path));
