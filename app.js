@@ -4,6 +4,10 @@ const config = {
     port: { websocket: 2337, app: 2338 }, // used for both websocket and app
 }
 
+///  IMPORT  ///
+const format = require("./src/format.js");
+const database = require("./src/database.js");
+
 ///  SETUP  ///
 // Express + routing
 const express = require("express");
@@ -37,8 +41,8 @@ wss.on('connection', (ws) => {
             data.author = "Anonymous User";
 
         // Sanetize
-        data.author = escapeHTML(data.author);
-        data.content = escapeHTML(data.content);
+        data.author = format.escapeHTML(data.author);
+        data.content = format.escapeHTML(data.content);
 
         // Find media links and insert media stuff
         
@@ -63,26 +67,6 @@ wss.on('connection', (ws) => {
     });
 });
 
-function escapeHTML(str) {
-    return str.replace(/[&<>"'\/]/g, (char) => {
-        switch (char) {
-        case '&':
-            return '&amp;';
-        case '<':
-            return '&lt;';
-        case '>':
-            return '&gt;';
-        case '"':
-            return '&quot;';
-        case '\\':
-            return '&#39;';
-        case '/':
-            return '&#x2F;';
-        default:
-            return char;
-        }
-    });
-}
 
 // Start server
 app.use(express.static(public_path));

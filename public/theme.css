@@ -32,7 +32,7 @@
     --bar-color: #111; /* 234 */
     
     --text-color: #0F0;
-    --light-text-color: #0F0E;
+    --light-text-color: #FFFE;
     --weak-text-color: #0F07;
     --link-text-color: #ACE;
 
@@ -40,9 +40,9 @@
 }
 
 :root[theme=light] {
-    --background-color: #DDD; /* 123 */
+    --background-color: #EEE; /* 123 */
     --pop-color: #FFF; /* 345 */
-    --bar-color: #EEE; /* 234 */
+    --bar-color: #F8F8F8; /* 234 */
 
     --text-color: #000;
     --light-text-color: #000E;
