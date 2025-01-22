@@ -65,9 +65,19 @@ p {
     overflow-x: hidden;
 }
 
-#messages > div {
+.message {
     padding: 0.4rem;
     margin-top: 0.5rem;
+
+    color: var(--light-text-color);
+}
+
+.message > * {
+    display: inline-block;
+}
+
+.message:hover {
+    background-color: var(--pop-color);
 }
 
 .author {
@@ -81,14 +91,6 @@ p {
     padding-left: 0.1rem;
     color: var(--weak-text-color);
     font-size: var(--text-size-small);
-}
-
-.message {
-    color: var(--light-text-color);
-}
-
-.message:hover {
-    background-color: var(--pop-color);
 }
 
 #message-bar {
@@ -108,7 +110,8 @@ p {
 
 
 img {
-    width: 24em;
+    height: 2.5em;
+    aspect-ratio: 1;
 }
 
 input[type=checkbox] {

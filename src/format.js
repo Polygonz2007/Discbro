@@ -1,10 +1,6 @@
 
 // This module is responsible for formatting messages sent by users, for exaple turning image links into images, removing unwanted HTML elements, bold, italics, underline, etc.
 
-export {
-    escapeHTML
-}
-
 // Prevent HTML from being rendered instead of text
 function escapeHTML(str) {
     return str.replace(/[&<>"'\/]/g, (char) => {
@@ -25,4 +21,8 @@ function escapeHTML(str) {
             return char;
         }
     });
+}
+
+module.exports = {
+    escapeHTML
 }

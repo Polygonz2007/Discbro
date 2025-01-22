@@ -4,7 +4,7 @@ const load_amount = 50; // amount of messages to load on scroll
 
 const doc = document;
 let root = doc.querySelector(":root");
-const socket = new WebSocket('ws://10.0.0.5:' + port);
+const socket = new WebSocket('ws://10.20.8.204:' + port);
 
 // Selecting theme
 let checkboxes = doc.querySelectorAll("#theme-select > li > input");
@@ -63,26 +63,17 @@ socket.onclose = (event) => {
 };
 
 function addMessage(data) {
-	// Remove any HTML-esque stuff that could be scary
-
-
 	// Write into messages div
 	const new_id = last_message + 1;
-	let last_message_element = doc.querySelector(`#msg${last_message}`);
-
-	if (last_message_element) {
-		if (data.author == last_message_element.getAttribute("author")) {
-			last_message_element.innerHTML += `<p class="message">${data.content}</p>`;
-			return;
-		}
-	}
-	
-	const highlight = (data.author == "System") ? `class="highlight"` : "";
-	messages.innerHTML += `<div id="msg${new_id}" author="${data.author}" ${highlight}>
-								<p class="author">${data.author}</p>
-								<p class="timestamp">${data.time}</p>
-								<p class="message">${data.content}</p>
+	messages.innerHTML += `<div class="message" >
+								<img src="/data/profile_pictures/default.png" />
+								<div>
+									<p class="author">${data.author}</p>
+									<p class="timestamp">${data.time}</p>
+									<p>${data.content}</p>
+								</div>
 							</div>`;
+
 	last_message = new_id;
 }
 

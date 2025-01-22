@@ -67,6 +67,7 @@ wss.on('connection', (ws) => {
     });
 });
 
+database.new_user("polygonz", "Polygonz", "Passord01");
 
 // Start server
 app.use(express.static(public_path));
