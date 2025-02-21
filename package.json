@@ -17,8 +17,11 @@
   },
   "homepage": "https://github.com/Polygonz2007/Discbro#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "better-sqlite3": "^11.8.1",
+    "ejs": "^3.1.10",
     "express": "^4.21.2",
+    "express-session": "^1.18.1",
     "path": "^0.12.7",
     "ws": "^8.18.0"
   }

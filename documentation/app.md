@@ -8,6 +8,24 @@ It works using SQLite3 as the database, Express.js as the server, bcrypt as the 
 The packages will be checked for vulnerabilities.
 
 
-
 ## Security
 The app currently runs on HTTP. This will change as I create a certificate and key, which will be used to convert it to HTTPS. This makes the app significantly more secure, as passwords will no longer be transmitted over the web in plain-text.
+
+All functionality of the app that requires to be logged in is located under "/app". Profile pictures, stuff that has been uploaded, etc. is not under here, since it should be accessible by anyone. On the other hand, the main page where settings for your profile, chats, server, etc. are located, are all under "/app".
+This means that login status should always be checked when entering a page under "/app".
+
+
+## Functions and what they return
+Since I am most used to writing code in C, the system I'm using here is as follows:
+If the function ran successfully, 0 is returned. If not, it returns a string with the error that occured.
+The thinking behind this is that if an error occured, it should be forwarded to the user who can then decide if they want to try again or just, give up, idk.
+If it is an error which should be handled by the server, however, I might choose to return -1 or another negative number, like you often do in C.
+This way it is easy to identify when an error has occured, which one it is, and how it should be handled.
+
+
+## Message loading
+Messages are loaded in chunks of 32 messages each. Maybe 48? Anyways,
+when first entering a channel the two newest chunks are loaded. When scrolling up enough to where you can see the previous chunk, another one is requested, that has the messages for before this chun again. This keep going until there are more than 16 chunks loaded, at this point the older ones start to get unloaded. (they each have an id based of when they where loaded first)
+Therefore, if you for exaple jump to a very old message and start scrolling down, new messages will load without having to load EVERYTHING between now and the message you are looking at.
+New messages you get are put into a chunk automatically and the chunk grows until it reaches the 32 per chunk limit.
+The chunks are stored in an object, with the messages inside, and in the HTML 

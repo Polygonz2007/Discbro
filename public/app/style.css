@@ -1,0 +1,120 @@
+
+
+
+
+
+
+
+/** Styles **/
+body {
+    font-family: var(--text-font);
+    font-size: var(--text-size);
+    color: var(--text-color);
+    background-color: var(--background-color);
+
+    overscroll-behavior: none;
+
+    margin-bottom: calc(var(--message-bar-height) + var(--segment-padding));
+    margin-left: calc(var(--sidebar-width) + var(--segment-padding));
+}
+
+/* Transistions for themes */
+* {
+    transition-property: background-color, color;
+    transition-duration: 0.4s;
+    transition-timing-function: ease-out;
+}
+
+input {
+    font-family: var(--text-size);
+    font-size: var(--text-size);
+    color: var(--text-color);
+
+    box-sizing: border-box;
+    padding: 0 var(--text-size);
+    height: calc(var(--text-size) + 1rem);
+
+    border: none;
+    border-radius: 0;
+    background-color: var(--pop-color);
+}
+
+p {
+    margin: 0;
+    padding: 0.15rem;
+    overflow-wrap: break-word;
+}
+
+.message {
+    padding: 0.4rem;
+    margin-top: 0.5rem;
+
+    color: var(--light-text-color);
+}
+
+.message > * {
+    display: inline-block;
+    max-width: calc(100% - 3.3em);
+}
+
+.message:hover {
+    background-color: var(--pop-color);
+}
+
+.author {
+    display: inline-block;
+    padding-right: 0.1rem;
+    font-weight: bold;
+}
+
+.timestamp {
+    display: inline-block;
+    padding-left: 0.1rem;
+    color: var(--weak-text-color);
+    font-size: var(--text-size-small);
+}
+
+#message-bar {
+    position: fixed;
+    width: calc(100vw - var(--sidebar-width));
+    height: var(--message-bar-height);
+
+    bottom: 0; right: 0;
+
+    background-color: var(--pop-color);
+    outline: none;
+}
+
+.highlight {
+    background-color: var(--highlight-color);
+}
+
+#sidebar {
+    position: fixed;
+    top: 0; left: 0;
+
+    width: var(--sidebar-width);
+    height: 100vh;
+    padding: var(--segment-padding);
+    box-sizing: border-box;
+
+    background-color: var(--bar-color);
+}
+
+img {
+    height: 2.5rem;
+    width: 2.5rem;
+    padding-top: 0.25em;
+    aspect-ratio: 1;
+
+    vertical-align: top;
+}
+
+input[type=checkbox] {
+    height: 1rem;
+}
+
+/* For mobile devices */
+@media all and (min-width:0px) and (max-width: 500px) {
+    
+}

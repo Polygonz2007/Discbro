@@ -2,16 +2,9 @@ body {
     margin: 2vh 12vw;
     background-color: var(--bar-color);
     color: var(--text-color);
-
-    font-family: var(--text-font);
-
+    
     justify-content: center;
     align-items: center;
-}
-
-img {
-    height: 10rem;
-    width: 76vw;
 }
 
 h1 {
@@ -34,6 +27,8 @@ a {
 
 #logo {
     margin-top: 9vh;
+    height: 10rem;
+    width: 76vw;
 }
 
 #subtitle {

@@ -4,11 +4,13 @@
     /* Dimensions */
     --sidebar-width: 24rem;
     --message-bar-height: 3rem;
+    --segment-padding: 0.3rem;
 
     /* Text */
-    --text-font: "Consolas", "Menlo";
+    --text-font: "Consolas";
     --text-size: 1rem;
     --text-size-small: 0.8rem;
+    --text-size-big: 1.5rem;
 
     --text-title-size: 3rem;
     --text-subtitle-size: 1.7rem;
@@ -17,6 +19,7 @@
     --background-color: #123; /* 123 */
     --pop-color: #345; /* 345 */
     --bar-color: #234; /* 234 */
+    --selected-color: #DDD;
 
     --text-color: #FFF;
     --light-text-color: #FFFE;
@@ -26,14 +29,14 @@
     --highlight-color: #AA57;
 }
 
-:root[theme=console] {
+:root[theme=midnight] {
     --background-color: #000; /* 123 */
     --pop-color: #222; /* 345 */
     --bar-color: #111; /* 234 */
     
-    --text-color: #0F0;
-    --light-text-color: #FFFE;
-    --weak-text-color: #0F07;
+    --text-color: #DDD;
+    --light-text-color: #DDDE;
+    --weak-text-color: #DDD7;
     --link-text-color: #ACE;
 
     --highlight-color: #2A27;
@@ -52,15 +55,27 @@
     --highlight-color: #EE37;
 }
 
-:root[theme=ice] {
-    --background-color: #BEF; /* 123 */
-    --pop-color: #CEF; /* 345 */
-    --bar-color: #DEF; /* 234 */
+/** Font **/
+@font-face {
+    font-family: "Consolas";
+    src: url("./graphics/font/CONSOLA.TTF");
+}
 
-    --text-color: #012;
-    --light-text-color: #012E;
-    --weak-text-color: #0127;
-    --link-text-color: #345;
+@font-face {
+    font-family: "Consolas";
+    src: url("./graphics/font/CONSOLAB.TTF");
+    font-weight: bold;
+}
 
-    --highlight-color: #8AC7;
+@font-face {
+    font-family: "Consolas";
+    src: url("./graphics/font/CONSOLAI.TTF");
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Consolas";
+    src: url("./graphics/font/CONSOLAZ.TTF");
+    font-weight: bold;
+    font-style: italic;
 }

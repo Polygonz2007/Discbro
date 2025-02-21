@@ -23,7 +23,7 @@ create table friends (
     user2id UNSIGNED INT NOT NULL,
     status UNSIGNED INT -- 0: pending, 1: accepted
 );
-
+ /*
 create table groups (
     -- Used for group dms since all channels are the same
     -- max 16 members
@@ -42,11 +42,21 @@ create table group_members (
     FOREIGN KEY (groupid) REFERENCES groups(id),
     FOREIGN KEY (userid) REFERENCES users(id)
 );
+ just temporarily though! */
+
+
+create table channels (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name varchar(127) NOT NULL
+);
 
 create table messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     channelid UNSIGNED INT NOT NULL,
+    authorid INT NOT NULL,
     content varchar(2048) NOT NULL,
-    author UNSIGNED INT NOT NULL,
-    timesent TIMESTAMP NOT NULL
+    time DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+
+    FOREIGN KEY (authorid) REFERENCES users(id),
+    FOREIGN KEY (chanelid) REFERENCES channels
 );

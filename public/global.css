@@ -1,0 +1,12 @@
+body, input {
+    font-family: var(--text-font);
+}
+
+input {
+    border: var(--weak-text-color) solid 2px;
+    outline: none;
+}
+
+input:focus {
+    background-color: var(--selected-color);
+}

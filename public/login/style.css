@@ -1,0 +1,74 @@
+body {
+    margin: 2vh 12vw;
+    background-color: var(--bar-color);
+    color: var(--text-color);
+
+    justify-content: center;
+    align-items: center;
+}
+
+h1 {
+    text-align: center;
+    font-size: var(--text-subtitle-size);
+
+    margin-top: 0;
+}
+
+p {
+    text-align: center;
+}
+
+a {
+    color: var(--link-text-color);
+}
+
+#logo {
+    margin-top: 9vh;
+    height: 10rem;
+    width: 76vw;
+}
+
+
+/* Form */
+form {
+    background-color: var(--pop-color);
+    width: 27rem;
+
+    margin: auto;
+    margin-top: var(--text-subtitle-size);
+    padding: 2rem 4rem;
+
+    box-sizing: border-box;
+}
+
+form > * {
+    display: block;
+}
+
+label {
+    font-size: var(--text-size-small);
+    margin-top: var(--text-size-big);
+}
+
+input {
+    font-size: var(--text-size);
+
+    width: 18rem;
+    padding: 0.2rem;
+    margin-top: 0.5rem;
+}
+
+input[type=submit] {
+    margin-top: var(--text-subtitle-size);
+}
+
+#info {
+    font-size: var(--text-size-small);
+}
+
+/* For phones */
+@media all and (min-width:0px) and (max-width: 500px) {
+    :root {
+        zoom: 75%;
+    }
+}

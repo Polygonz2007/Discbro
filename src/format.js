@@ -2,7 +2,7 @@
 // This module is responsible for formatting messages sent by users, for exaple turning image links into images, removing unwanted HTML elements, bold, italics, underline, etc.
 
 // Prevent HTML from being rendered instead of text
-function escapeHTML(str) {
+function escape_html(str) {
     return str.replace(/[&<>"'\/]/g, (char) => {
         switch (char) {
         case '&':
@@ -23,6 +23,20 @@ function escapeHTML(str) {
     });
 }
 
+function links(str) {
+    const reg = new RegExp("https:\/\/([^\s]+)");
+    console.log(str);
+
+    //while (str.match(reg)) {
+    if (str.match(reg)) {
+        let link = str.match(reg);
+        const formatted = "<a>" + link[0] + "</a>";
+    }
+
+    return str;
+}
+
 module.exports = {
-    escapeHTML
+    escape_html,
+    links
 }
