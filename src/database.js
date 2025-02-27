@@ -42,30 +42,12 @@ function new_group() {
     return 0;
 }
 
-function get_current_chunk(channelid) {
-    const query = db.prepare("SELECT COUNT(*), chunk FROM messages WHERE chunk = (SELECT chunk FROM messages ORDER BY id DESC LIMIT 1)");
-    let result = query.get();
-    if (!result)
-        return false;
-
-    result.count = result["COUNT(*)"];
-
-    // Get next chunk
-    if (result.chunk == null)
-        return 0;
-
-    if (result.count >= chunk_s)
-        return result.chunk + 1;
-    else
-        return result.chunk;
-}
-
-function new_message(channelid, authorid, content, dochunks) {
+function new_message(channelid, authorid, content) {
     if (content.length > 2048)
         return false;
 
-    const query = db.prepare("INSERT INTO messages (channelid, authorid, content, chunk) VALUES (?, ?, ?, ?)");
-    let result = query.run(channelid, authorid, content, dochunks ? get_current_chunk(channelid) : 0);
+    const query = db.prepare("INSERT INTO messages (channelid, authorid, content) VALUES (?, ?, ?)");
+    let result = query.run(channelid, authorid, content);
 
     if (result.changes == 0)
         return false;
@@ -99,15 +81,43 @@ function get_group_members() {
     return true;
 }
 
+// Get all messages in a channel
 function get_messages(channelid) {
-    // Curently get all messages in a channel
-    const query = db.prepare("SELECT * FROM messages WHERE channelid = ? ORDER BY id DESC LIMIT ?");
-    let result = query.all(channelid, chunk_s);
+    const query = db.prepare("SELECT * FROM messages WHERE channelid = ? ORDER BY id DESC");
+    let result = query.all(channelid);
 
     if (result.length != 0)
         return result;
 
     return false;
+}
+
+// Gets a chunk of messages, of size chunk_s
+// If dir is false, it reads messages BEFORE lastid
+// Else, if dir is true, it reads messages AFTER lastid
+// If no lastid is specified, it gets the newest chunk
+function get_message_chunk(channelid, dir = false, lastid) {
+    // If empty, get newest
+    if (lastid == null) {
+        const query = db.prepare(`SELECT * FROM messages WHERE channelid = ? ORDER BY id DESC LIMIT ?`);
+        let result = query.all(channelid, chunk_s);
+        if (result.length == 0) // If empty, return error
+            return false;
+
+        return result.reverse();
+    }
+
+    // We need to find the chunk we are looking for
+    const query = db.prepare(`SELECT * FROM messages WHERE id ${dir ? ">" : "<"} ? AND channelid = ? ORDER BY id ${dir ? "ASC" : "DESC"} LIMIT ?`);
+    let result = query.all(lastid, channelid, chunk_s);
+    if (result.length == 0) // If empty, return error
+        return false;
+
+    // Flip order of chunk when reading old messages
+    if (!dir)
+        result.reverse();
+
+    return result;
 }
 
 function get_message(messageid) {
@@ -168,14 +178,17 @@ function delete_user(username) {
 
 module.exports = {
     new_user,
-    new_group,
-    new_message,
     check_username,
     get_user_info,
-    get_group_members,
-    get_current_chunk,
-    get_messages,
-    get_message,
     delete_user,
+
+    new_group,
+    get_group_members,
+    
+    new_message,
+
+    get_message,
+    get_messages,
+    get_message_chunk,
     format_messages
 }

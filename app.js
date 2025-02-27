@@ -10,6 +10,7 @@ const format = require("./src/format.js");
 const database = require("./src/database.js");
 const account = require("./src/account.js");
 const page = require("./src/page.js");
+const websocket = require("./src/websocket.js");
 
 
 ///  SETUP  ///
@@ -46,13 +47,13 @@ const public_path = path.join(__dirname, "public");
 app.set('views', path.join(public_path, "app"));
 app.set('view engine','ejs');
 
-// WebSockets
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({ noServer: true });
-
 // HTTP
 const http = require("http");
 const server = http.createServer(app);
+
+// WebSockets
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ noServer: true });
 
 server.on('upgrade', function (request, socket, head) {
     socket.on('error', console.error);
@@ -74,39 +75,20 @@ server.on('upgrade', function (request, socket, head) {
     });
 });
 
-// Handle webseockets
 wss.on('connection', (ws, req) => {
-    const mad = database.format_messages(database.get_messages(1));
-    ws.send(JSON.stringify(mad)); // send history (replcae with loading only portion of it)
+    // Send first chunk
+    const chunk = database.format_messages(database.get_message_chunk(1));
+    ws.send(JSON.stringify(chunk));
     
     ws.on('message', (data, isBinary) => {
         data = isBinary ? data : data.toString();
         data = JSON.parse(data);
 
-        console.log(data);
-
-        const user = database.get_user_info(req.session.userid);
-        data.author = user.username;
-        if (!data.author)
-            data.author = "Anonymous User";
-
-        // Find media links and insert media stuff
-        //data.content = format.links(data.content);
-
-        // Sanetize
-        data.author = format.escape_html(data.author);
-        data.content = format.escape_html(data.content);
-
-        // Handle incoming message
-        const messageid = database.new_message(1, user.id, data.content);
-        if (!messageid)
-            return;
-
-        const result = database.format_messages(database.get_message(messageid));
-
-        wss.clients.forEach((client) => {
-            client.send(JSON.stringify([result]));
-        });
+        const type = data.type;
+        switch (type) {
+            case "send": websocket.ws_send(data, req, ws); return;
+            case "get": websocket.ws_get(data, req, ws); return;
+        }
     });
 
     ws.on('close', () => {
