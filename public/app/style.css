@@ -14,7 +14,7 @@ body {
 
     overscroll-behavior: none;
 
-    margin-bottom: calc(var(--message-bar-height) + var(--segment-padding));
+    margin-bottom: calc(var(--message-box-height) + var(--segment-padding));
     margin-left: calc(var(--sidebar-width) + var(--segment-padding));
 }
 
@@ -74,10 +74,10 @@ p {
     font-size: var(--text-size-small);
 }
 
-#message-bar {
+#message-box {
     position: fixed;
     width: calc(100vw - var(--sidebar-width));
-    height: var(--message-bar-height);
+    height: var(--message-box-height);
 
     bottom: 0; right: 0;
 

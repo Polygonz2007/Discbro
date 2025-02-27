@@ -34,7 +34,7 @@ app.all("/app/*", account.check_login); // Make sure no gets or posts happen wit
 
 // Get
 app.get("/app/user/:userid", page.profile); 
-app.get("/app", page.app);
+//app.get("/app", page.app);
 
 // Post
 app.post("/login", account.login); // Allow users to log in, check if the credentials are correct and if they are update session
@@ -74,11 +74,6 @@ server.on('upgrade', function (request, socket, head) {
     });
 });
 
-// Temporary storage for messages
-let messages = [
-    { author: "System", time: "", content: "Welcome to Discbro! Be nice pls :)" }
-]
-
 // Handle webseockets
 wss.on('connection', (ws, req) => {
     const mad = database.format_messages(database.get_messages(1));
@@ -87,6 +82,8 @@ wss.on('connection', (ws, req) => {
     ws.on('message', (data, isBinary) => {
         data = isBinary ? data : data.toString();
         data = JSON.parse(data);
+
+        console.log(data);
 
         const user = database.get_user_info(req.session.userid);
         data.author = user.username;
@@ -104,8 +101,8 @@ wss.on('connection', (ws, req) => {
         const messageid = database.new_message(1, user.id, data.content);
         if (!messageid)
             return;
-        
-        const result = database.get_message(messageid);
+
+        const result = database.format_messages(database.get_message(messageid));
 
         wss.clients.forEach((client) => {
             client.send(JSON.stringify([result]));

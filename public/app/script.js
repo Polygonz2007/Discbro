@@ -1,69 +1,48 @@
+
 const port = 2337; // port used for WebSocket
-const load_new_dist = 200; // distance to top to load old messages
-const load_amount = 50; // amount of messages to load on scroll
+const url = `ws://${window.location.host}`;
 
 const doc = document;
 let root = doc.querySelector(":root");
-const socket = new WebSocket(`ws://${window.location.host}`);
+const socket = new WebSocket(url);
 
-// Selecting theme
-let checkboxes = doc.querySelectorAll("#theme-select > li > input");
-
-checkboxes.forEach((checkbox) => {
-	// Set default theme
-	if (checkbox.checked)
-		root.setAttribute("theme", checkbox.id);
-
-	checkbox.addEventListener("change", () => {
-		// Only for the active one
-		if (!checkbox.checked)
-			return;
-
-		root.setAttribute("theme", checkbox.id);
-
-		// Uncheck others
-		checkboxes.forEach((des) => {
-			if (des != checkbox)
-				des.checked = false;
-		});
-	});
-});
+console.log(`Connecting on ${url}...`);
 
 // Sending messages
-let message_field = doc.querySelector("#message-bar");
-
+let message_box = doc.querySelector("#message-box");
 let messages = doc.querySelector("body");
-let last_message = 0;
 
 socket.onopen = (event) => {
-	// Handle connection open
-	message_field.addEventListener("keydown", (e) => {
-		if (e.key == 'Enter'){
-		  // Enter pressed
+	// Connected, set up event listener
+	message_box.addEventListener("keydown", (e) => {
+		if (e.key == 'Enter') {
 		  sendMessage();
 		}
 	  });
 };
 
 socket.onmessage = (event) => {
+	console.log(`Received data from ${url}. [${now()}]`);
+
 	// Handle received message
 	const data = JSON.parse(event.data);
 
 	for (let i = data.length - 1; i >= 0; i--) {
 		addMessage(data[i]); // Loop, when multiple messages arrive at once (at start)
 	}
-
-	// Scroll down
-	messages.scrollTop = messages.scrollHeight;
 };
 
 socket.onclose = (event) => {
 	// Handle connection close
+	console.warn(`Connection to WebSocket lost. [${now()}]`);
 };
 
 function addMessage(data) {
+	// Translate to local time
+	const date = new Date(data.time * 1000);
+	data.time = date.toLocaleString("en-GB");
+
 	// Write into messages div
-	const new_id = last_message + 1;
 	messages.innerHTML += `<div class="message" >
 								<img src="/data/profile_pictures/default.png" />
 								<div>
@@ -73,15 +52,22 @@ function addMessage(data) {
 								</div>
 							</div>`;
 
-	last_message = new_id;
+	message_box.addEventListener("keydown", (e) => {
+		if (e.key == 'Enter') {
+			// Enter pressed
+			sendMessage();
+		}
+		});
 }
 
 function sendMessage() {
+	console.log(`Posting message.`);
+
 	// Get data
-	const content = message_field.value;
+	const content = message_box.value;
 
 	if (content.replace(/\s+/g, '') === "")
-		return; // camt send empty message
+		return; // cant send empty message
 
 	// Send
 	const data = { "content": content };
@@ -90,11 +76,16 @@ function sendMessage() {
 	socket.send(send);
 
 	// Clear box
-	message_field.value = "";
+	message_box.value = "";
 }
 
-messages.addEventListener("scroll", () => {
-	console.log(messages.scrollTop);
-})
-
 root.setAttribute("theme", "midnight");
+
+
+
+// Functions (move to another file at some point)
+function now() {
+	const date = new Date();
+
+	return date.toLocaleTimeString();
+}

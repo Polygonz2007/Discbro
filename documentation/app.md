@@ -28,4 +28,6 @@ Messages are loaded in chunks of 32 messages each. Maybe 48? Anyways,
 when first entering a channel the two newest chunks are loaded. When scrolling up enough to where you can see the previous chunk, another one is requested, that has the messages for before this chun again. This keep going until there are more than 16 chunks loaded, at this point the older ones start to get unloaded. (they each have an id based of when they where loaded first)
 Therefore, if you for exaple jump to a very old message and start scrolling down, new messages will load without having to load EVERYTHING between now and the message you are looking at.
 New messages you get are put into a chunk automatically and the chunk grows until it reaches the 32 per chunk limit.
-The chunks are stored in an object, with the messages inside, and in the HTML 
+The chunks are stored in an object, with the messages inside.
+
+I ran some tests and concluded with that, chunks are to be calculated when loading messages (simply by selecting the newest 32 for the channel you want, then excluding those in the next selection). By storing the chunk id in the message object you can increase loading times by a tiny bit, but this is far outweighed by the fact that 32 calculations for chunk index have to be done IN REAL TIME (aka slower sending of messages) compared to the one time you need when loading, which should be slower either way.

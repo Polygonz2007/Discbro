@@ -8,6 +8,8 @@ db.pragma('journal_mode = WAL');
 const bcrypt = require("bcrypt");
 const salt_rounds = 10;
 
+const chunk_s = 32;
+
 // Adds a user to the database, with checks if it is a valid name and stuff
 function new_user(username, displayname, password) {
     // Check length
@@ -40,17 +42,35 @@ function new_group() {
     return 0;
 }
 
-function new_message(channelid, authorid, content) {
+function get_current_chunk(channelid) {
+    const query = db.prepare("SELECT COUNT(*), chunk FROM messages WHERE chunk = (SELECT chunk FROM messages ORDER BY id DESC LIMIT 1)");
+    let result = query.get();
+    if (!result)
+        return false;
+
+    result.count = result["COUNT(*)"];
+
+    // Get next chunk
+    if (result.chunk == null)
+        return 0;
+
+    if (result.count >= chunk_s)
+        return result.chunk + 1;
+    else
+        return result.chunk;
+}
+
+function new_message(channelid, authorid, content, dochunks) {
     if (content.length > 2048)
         return false;
 
-    const query = db.prepare("INSERT INTO messages (channelid, authorid, content) VALUES (?, ?, ?)");
-    let result = query.run(channelid, authorid, content);
+    const query = db.prepare("INSERT INTO messages (channelid, authorid, content, chunk) VALUES (?, ?, ?, ?)");
+    let result = query.run(channelid, authorid, content, dochunks ? get_current_chunk(channelid) : 0);
 
     if (result.changes == 0)
         return false;
 
-    return true;
+    return result.lastInsertRowid;
 }
 
 function check_username(username) {
@@ -81,8 +101,8 @@ function get_group_members() {
 
 function get_messages(channelid) {
     // Curently get all messages in a channel
-    const query = db.prepare("SELECT * FROM messages WHERE channelid = ? ORDER BY id DESC LIMIT 32");
-    let result = query.all(channelid);
+    const query = db.prepare("SELECT * FROM messages WHERE channelid = ? ORDER BY id DESC LIMIT ?");
+    let result = query.all(channelid, chunk_s);
 
     if (result.length != 0)
         return result;
@@ -93,7 +113,7 @@ function get_messages(channelid) {
 function get_message(messageid) {
     // Curently get all messages in a channel
     const query = db.prepare("SELECT * FROM messages WHERE id = ?");
-    let result = query.all(channelid);
+    let result = query.all(messageid);
 
     if (result.length != 0)
         return result;
@@ -153,7 +173,9 @@ module.exports = {
     check_username,
     get_user_info,
     get_group_members,
+    get_current_chunk,
     get_messages,
+    get_message,
     delete_user,
     format_messages
 }

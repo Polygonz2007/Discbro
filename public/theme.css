@@ -3,7 +3,7 @@
 :root { /* Default theme: dark */
     /* Dimensions */
     --sidebar-width: 24rem;
-    --message-bar-height: 3rem;
+    --message-box-height: 3rem;
     --segment-padding: 0.3rem;
 
     /* Text */
