@@ -19,8 +19,7 @@ This means that login status should always be checked when entering a page under
 Since I am most used to writing code in C, the system I'm using here is as follows:
 If the function ran successfully, 0 is returned. If not, it returns a string with the error that occured.
 The thinking behind this is that if an error occured, it should be forwarded to the user who can then decide if they want to try again or just, give up, idk.
-If it is an error which should be handled by the server, however, I might choose to return -1 or another negative number, like you often do in C.
-This way it is easy to identify when an error has occured, which one it is, and how it should be handled.
+If it is an error which should be handled by the server, however, I might choose to return false. If the function can fail in multiple ways i might return a negative number, liker in C, which identifies which error occured.
 
 
 ## Message loading
