@@ -3,6 +3,19 @@ const doc = document;
 const form = doc.querySelector("form");
 const info = doc.querySelector("#info");
 
+// Check for username formatting
+const username_field = doc.querySelector("#username");
+
+username_field.addEventListener("keyup", () => {
+    const username = username_field.value;
+
+    if (!username.match(/^[a-z0-9-_]+$/) || username.length < 4 || username.length > 32)
+        username_field.classList.add("invalid");
+    else
+        username_field.classList.remove("invalid");
+});
+
+// Send request to server
 form.addEventListener("submit", login);
 
 async function login(event) {

@@ -27,6 +27,7 @@
     --link-text-color: #ACE;
 
     --highlight-color: #AA57;
+    --error-color: #A55;
 }
 
 :root[theme=midnight] {

@@ -7,10 +7,20 @@ const root = doc.querySelector(":root");
 const body = doc.body;
 const socket = new WebSocket(url);
 
-const state = {
-	channelid: 1,
-	lastid: Infinity,
-	new_chunk: null
+let app = {
+	channel_id: 1,
+
+	max_chunks: 8, // Max number of chunks that can be loaded at once, configurable by user
+	chunk_s: 32, // size of each chunk
+	up_to_date: false, // If true, it means the newest available chunk is loaded
+	chunk_loading: false, // If true, a request is currently being handled. Do NOT make a new request while this is true
+
+	chunk_index: 0, // incremented for each new chunk, used for unique index
+	oldest_chunk: 0, // when loading a chunk backward, update this
+	newest_chunk: 0, // when loading chunk forward, update this
+	chunks: [
+		// id: ?, messages: ..., oldest_id, newest_id, prev_id
+	]
 }
 
 console.log(`Connecting on ${url}...`);
@@ -27,28 +37,124 @@ socket.addEventListener("open", (event) => {
 		}
 	  });
 
-	  return;
+	  get_chunk(true); // after, because there are none yet, and we want latest messages
+
+	return;
 });
 
 socket.addEventListener("message", (event) => {
-	// Handle received message
+	// Parse, get, and check data
 	const data = JSON.parse(event.data);
-	console.log(`Parsing ${data.length} message(s) from ${url} at ${now()}`);
+	console.log(data);
+	const dir = data.dir; // false: older, true: newer
+	let messages = data.messages;
+	if (messages.length == 0) {
+		if (dir == true)
+			app.up_to_date = true;
 
-	const chunk = doc.createElement("div");
-	chunk.classList = "chunk";
-	for (let i = 0; i < data.length; i++) {
-		addMessage(data[i], chunk); // Loop, when multiple messages arrive at once (at start)
+		app.chunk_loading = false;
+		return;
 	}
 
-	const last = doc.querySelector("div.chunk");
-	if (!last)
-		body.append(chunk);
-	else
-		body.insertBefore(chunk, last);
-	
-	scroll(0, Infinity);
+	// Check if it is a lone message, not in a chunk
+	if (data.type == "message") {
+		// If up to date, we can either add to the newest chunk or make a new one if previous is full
+		if (!app.up_to_date)
+			return; // In the future, notify user of new messages on top of screen
 
+		// Format time
+		messages = format_datetime(messages);
+
+		let newest_chunk = get_chunk_by_id(app.newest_chunk);
+		console.log(newest_chunk.id);
+		if (newest_chunk.messages.length < app.chunk_s) {
+			// Add message to newest chunk
+			newest_chunk.messages.push(messages[0]);
+			newest_chunk.newest_id = messages[0].id;
+			console.log("prev chunk: " + get_farthest_chunk_id(true, app.newest_chunk));
+			refresh_chunk(app.newest_chunk, get_farthest_chunk_id(true, app.newest_chunk));
+
+			scroll_to_bottom();
+			app.chunk_loading = false;
+			return;
+		}
+
+		// We have to make a new one!
+		// Store previous newest chunk
+		const prev_chunk = get_chunk_by_id(app.newest_chunk);
+		const prev_newest_chunk_message = get_message_by_id(prev_chunk.newest_id);
+		
+		// Remove chunks if there are too many now
+		if (app.chunks.length > app.max_chunks)
+			remove_chunk(app.oldest_chunk); // because new messages always appear newest
+
+		// Create the new chunk data, add message
+		const message_id = messages[0].id;
+		app.chunks.push({ "id": app.chunk_index, "messages": messages, "oldest_id": message_id, "newest_id": message_id });
+
+		// And add it to the DOM
+		add_chunk(prev_newest_chunk_message, true, app.chunk_index);
+		app.newest_chunk = app.chunk_index;
+		app.chunk_index++;
+
+		scroll_to_bottom();
+		app.chunk_loading = false;
+		return;
+	}
+
+	console.log(`Parsing ${data.messages.length} message(s) from ${url} at ${now()}`);
+
+	// Add to chunks
+	delete data.dir;
+	delete data.type;
+
+	const pos = app.chunks.push(data) - 1;
+	let chunk = app.chunks[pos];
+	chunk.id = app.chunk_index;
+	app.chunk_index++;
+
+	chunk.oldest_id = Infinity;
+	chunk.newest_id = 0;
+
+	// Find oldest_id & newest_id
+	for (let i = 0; i < messages.length; i++) {
+		// Check id
+		if (messages[i].id < chunk.oldest_id)
+			chunk.oldest_id = messages[i].id;
+		else if (messages[i].id > chunk.newest_id)
+			chunk.newest_id = messages[i].id;
+	}
+
+	// Add formatting for time
+	format_datetime(messages);
+
+	// Previous, for combining messages by same author
+	const prev_chunk = get_chunk_by_id(dir ? app.newest_chunk : -1);
+	let prev;
+	if (prev_chunk)
+		prev = get_message_by_id(prev_chunk.newest_id);
+
+	if (prev)
+		chunk.prev_id = prev.id;
+
+	// Add chunk, and update first / last chunk
+	add_chunk(prev, dir, chunk.id);
+
+	if (dir)
+		app.newest_chunk = chunk.id;
+	else {
+		refresh_chunk(app.oldest_chunk, chunk.id);
+		app.oldest_chunk = chunk.id;
+	}
+
+	// Remove old chunk (if necessary)
+	if (app.chunks.length > app.max_chunks) {
+		const to_unload = dir ? app.oldest_chunk : app.newest_chunk; // opposite of scrolling direction
+		console.log(`Unloading ${to_unload} because of new chunk in direction ${dir ? "new" : "old"}!\nOldest: ${app.oldest_chunk}, newest: ${app.newest_chunk}`);
+		remove_chunk(to_unload);
+	}
+
+	app.chunk_loading = false;
 	return;
 });
 
@@ -58,27 +164,6 @@ socket.addEventListener("close", (event) => {
 
 	return;
 });
-
-function addMessage(data, chunk) {
-	console.log(data);
-
-	// Translate to local time
-	const date = new Date(data.time * 1000);
-	data.time = date.toLocaleString("en-GB");
-
-	// Write into messages div
-	chunk.innerHTML  += `<div class="message" id="M${data.id}" >
-								<img src="/data/profile_pictures/default.png" />
-								<div>
-									<p class="author">${data.author}</p>
-									<p class="timestamp">${data.time}</p>
-									<p class="content">${data.content}</p>
-								</div>
-							</div>`;
-
-	if (data.id < state.lastid)
-		state.lastid = data.id;
-}
 
 function sendMessage() {
 	console.log("Posting message.");
@@ -99,37 +184,249 @@ function sendMessage() {
 	message_box.value = "";
 }
 
-function get_chunk() {
-	console.log("Getting chunk.");
+function get_chunk(dir = false) {
+	// Dont make multiple requests at once
+	if (app.chunk_loading)
+		return;
 
-	// Get
-	let data = { "type": "get", "channelid": state.channelid, "dir": false, "lastid": state.lastid };
+	app.chunk_loading = true;
+	console.log(`Getting a${dir ? " newer" : "n older"} chunk!`);
+
+	// Find chunk to compare position to
+	let message_id; // if message_id is null, server gives us the newest messages
+	const chunk = get_chunk_by_id(dir ? app.newest_chunk : app.oldest_chunk);
+	if (chunk) // but if we already have a chunk we find based off that
+		message_id = dir ? chunk.newest_id : chunk.oldest_id;
+
+	let data = { "type": "get", "channel_id": app.channel_id, "dir": dir, "last_id": message_id, "chunk_s": app.chunk_s };
 	data = JSON.stringify(data);
 
 	socket.send(data);
 }
 
+function add_chunk(prev, dir, id) {
+	// Create chunk div
+	const chunk = doc.createElement("div");
+	chunk.classList = "chunk";
+	chunk.id = "C" + id;
+
+	// Write messages into it
+	write_messages(chunk, id, prev);
+	if (dir)
+		body.append(chunk);
+	else
+		body.insertBefore(chunk, doc.querySelector("#C" + app.oldest_chunk));
+		
+	console.log(`I am chunk ${id} and my direction is ${dir ? "after" : "before"} all other chunks! ${dir ? "" : `I was placed after chunk C${app.oldest_chunk}`}`);
+	console.log(`The previous message is ${prev ? prev.content : ""}`);
+
+	const r = Math.floor(Math.random() * 255);
+	const g = Math.floor(Math.random() * 255);
+	const b = Math.floor(Math.random() * 255);
+	chunk.style.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.2)`;
+
+	return id;
+}
+
+function refresh_chunk(id, prev_id) {
+	console.log(`Refreshing chunk ${id} using chunk ${prev_id} as previous.`)
+
+	// Get chunk
+	const chunk = doc.querySelector("#C" + id);
+	let prev;
+	if (prev_id != null) {
+		const prev_c = get_chunk_by_id(prev_id);
+		console.log(prev_c.newest_id)
+		prev = get_message_by_id(prev_c.newest_id);
+	}
+	
+	if (!chunk)
+		return false;
+
+	// Clear it
+	chunk.textContent = "";
+
+	// Add messages
+	write_messages(chunk, id, prev);
+
+	return true;
+}
+
+function remove_chunk(id) {
+	const chunk = doc.querySelector("#C" + id);
+	if (!chunk) {
+		console.warn(`Error unloading chunk ${id}, not found!`);
+		return;	
+	}
+
+	chunk.remove();
+	app.chunks.splice(get_chunk_pos_by_id(id), 1);
+
+	if (id == app.newest_chunk)
+		app.up_to_date = false;
+
+	// Update oldest / newest
+	if (app.oldest_chunk == id)
+		app.oldest_chunk = get_farthest_chunk_id(false);
+	else if (app.newest_chunk == id)
+		app.newest_chunk = get_farthest_chunk_id(true);
+
+	console.log(`Updated, newest ${app.newest_chunk}, oldest ${app.oldest_chunk}`);
+}
+
+function write_messages(chunk, id, prev) {
+	// Get info
+	const messages = get_chunk_by_id(id).messages;
+
+	// Write messages into it
+	for (let i = 0; i < messages.length; i++) {
+		// Write into messages div
+		const current = messages[i];
+		if (prev && current.author.id == prev.author.id && (current.time - prev.time < (60 * 5))) { // same author, and less than 5 minutes ago
+			chunk.innerHTML  += 
+			`<div class="message detached" id="M${current.id}" >
+					<p class="content detached">${current.content}</p>
+			</div>`;
+
+		} else {
+			chunk.innerHTML  += 
+			`<div class="message" id="M${current.id}" >
+				<a href="/app/user/${current.author.id}"><img src="/data/profile_pictures/default.png"></img></a>
+				<div>
+					<a class="author" href="/app/user/${current.author.id}">${current.author.display_name} [@${current.author.username}]</a>
+					<p class="timestamp">${current.time_date}</p>
+					<p class="content">${current.content}</p>
+				</div>
+			</div>`;
+
+		}
+
+		prev = current;
+	}
+
+	return true;
+}
+
 root.setAttribute("theme", "midnight");
-scroll(0, Infinity);
+//scroll(0, Infinity);
 
 window.addEventListener("scroll", () => {
-	let chunks = doc.querySelectorAll("div.chunk");
-	let load = true;
+	// Get chunks we care about
+	const oldest = doc.querySelector("#C" + app.oldest_chunk);
+	const newest = doc.querySelector("#C" + app.newest_chunk);
 
-	chunks.forEach((chunk) => {
-		const rect = chunk.getBoundingClientRect();
-		
-		if (rect.top < 0)
-			load = false;
-	});
+	// Get current scroll stuff
+	const message_box_height = message_box.getBoundingClientRect().height;
 
-	if (load)
-		get_chunk();
+	// If they are visible, load new chunk in that direction
+	// If we cant load a newer one, set "up_to_date" to true so we dont spam server with requests
+	if (oldest) {
+		const oldest_view = oldest.getBoundingClientRect();
+		const oldest_boundary = oldest_view.y + oldest_view.height;
+
+		// Compare bottom of oldest chunk to top of screen
+		if (oldest_boundary > 0)
+			get_chunk(false);
+	}
+
+	if (newest && !app.up_to_date) {
+		const newest_view = newest.getBoundingClientRect();
+		const newest_boundary = newest_view.y - window.innerHeight - message_box_height;
+
+		// Compare top of newest chunk to bottom of screen
+		if (newest_boundary < 0)
+			get_chunk(true);
+	}
 });
 
-// Functions (move to another file at some point)
+///  UTILITY FUNCTIONS  ///
 function now() {
 	const date = new Date();
 
 	return date.toLocaleTimeString();
+}
+
+function get_chunk_by_id(id) {
+	for (let i = 0; i < app.chunks.length; i++) {
+		if (app.chunks[i].id == id)
+			return app.chunks[i];
+	}
+
+	return false;
+}
+
+function get_chunk_pos_by_id(id) {
+	for (let i = 0; i < app.chunks.length; i++) {
+		if (app.chunks[i].id == id)
+			return i;
+	}
+
+	return false;
+}
+
+function get_message_by_id(id) {
+	for (let i = 0; i < app.chunks.length; i++) {
+		const chunk = app.chunks[i];
+		if (!(chunk.oldest_id <= id && chunk.newest_id >= id))
+			continue;
+
+		// Found out chunk
+		for (let j = 0; j < chunk.messages.length; j++) {
+			const message = chunk.messages[j];
+			if (message.id == id)
+				return message;
+		}
+	}
+
+	return false;
+}
+
+// Gets the farthest chunk in either direction. Can also be used to find second-farthest with ignore id
+function get_farthest_chunk_id(dir, ignore_id) {
+	if (dir) {
+		// Find chunk with newest messages
+		let current_id = 0;
+		let current_chunk_id = null;
+
+		console.log("finding newest without " + ignore_id)
+
+		for (let i = 0; i < app.chunks.length; i++) {
+			const chunk = app.chunks[i];
+			console.log(`checking ${chunk.id}, with its ${chunk.newest_id} compared to the current winner of ${current_id} (chunk ${current_chunk_id})`);
+			if (chunk.newest_id > current_id && chunk.id != ignore_id) {
+				current_id = chunk.newest_id;
+				current_chunk_id = chunk.id;
+			}
+		}
+
+		return current_chunk_id;
+	} else {
+		// Find chunk with oldest messages
+		let current_id = Infinity;
+		let current_chunk_id = null;
+
+		for (let i = 0; i < app.chunks.length; i++) {
+			const chunk = app.chunks[i];
+			if (chunk.oldest_id < current_id && chunk.id != ignore_id) {
+				current_id = chunk.newest_id;
+				current_chunk_id = chunk.id;
+			}
+		}
+
+		return current_chunk_id;
+	}
+}
+
+function scroll_to_bottom() {
+	scroll(0, body.getBoundingClientRect().height);
+}
+
+function format_datetime(messages) {
+	for (let i = 0; i < messages.length; i++) {
+		// Translate to local time
+		const date = new Date(messages[i].time * 1000);
+		messages[i].time_date = date.toLocaleString("en-GB");
+	}
+
+	return messages;
 }

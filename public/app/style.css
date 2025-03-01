@@ -50,6 +50,19 @@ p {
     margin-top: 0.5rem;
 
     color: var(--light-text-color);
+    transition-property: padding-left;
+    transition-duration: 0.3s;
+    transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+div.detached {
+    margin: 0;
+    padding: 0;
+    padding-bottom: 0.4rem;
+}
+
+p.detached {
+    padding-left: 3.4rem;
 }
 
 .message > * {
@@ -59,6 +72,7 @@ p {
 
 .message:hover {
     background-color: var(--pop-color);
+    padding-left: 0.3rem;
 }
 
 .author {
@@ -79,7 +93,7 @@ p {
     width: calc(100vw - var(--sidebar-width));
     height: var(--message-box-height);
 
-    bottom: 0; right: 0;
+    bottom: 0; left: var(--sidebar-width);
 
     background-color: var(--pop-color);
     outline: none;
@@ -101,6 +115,16 @@ p {
     background-color: var(--bar-color);
 }
 
+a {
+    vertical-align: top;
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
 img {
     height: 2.5rem;
     width: 2.5rem;
@@ -115,6 +139,12 @@ input[type=checkbox] {
 }
 
 /* For mobile devices */
-@media all and (min-width:0px) and (max-width: 500px) {
-    
+@media all and (min-width:0px) and (max-width: 670px) {
+    :root {
+        --sidebar-width: 0rem;
+    }
+
+    #sidebar {
+        display: none;
+    }
 }

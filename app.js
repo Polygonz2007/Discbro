@@ -4,6 +4,8 @@ const config = {
     port: { websocket: 2337, app: 2338 }, // used for both websocket and app
 }
 
+///  ?!?!?  ///
+const fs = require("fs");
 
 ///  IMPORT  ///
 const format = require("./src/format.js");
@@ -50,15 +52,17 @@ app.set('view engine','ejs');
 // HTTP
 const http = require("http");
 const server = http.createServer(app);
+format.log("server", `HTTP server created.`);
 
 // WebSockets
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ noServer: true });
+global.wss = new WebSocket.Server({ noServer: true });
+format.log("server", `WebSocket server created.`);
 
 server.on('upgrade', function (request, socket, head) {
     socket.on('error', console.error);
 
-    console.log("Starting Websocket connection.");
+    format.log("websocket", `Connecting to ${request.rawHeaders[1]}`);
 
     session_parser(request, {}, () => {
         if (!request.session.userid) {
@@ -76,10 +80,6 @@ server.on('upgrade', function (request, socket, head) {
 });
 
 wss.on('connection', (ws, req) => {
-    // Send first chunk
-    const chunk = database.format_messages(database.get_message_chunk(1));
-    ws.send(JSON.stringify(chunk));
-    
     ws.on('message', (data, isBinary) => {
         data = isBinary ? data : data.toString();
         data = JSON.parse(data);
@@ -96,8 +96,16 @@ wss.on('connection', (ws, req) => {
     });
 });
 
+// Not found page
+app.use("*", (req, res) => {
+    if (!fs.existsSync(path.join(public_path, req.baseUrl)))
+        res.sendFile(path.join(public_path, "/util/not-found.html"));
+    else
+        req.next();
+});
+
 // Start server
 app.use(express.static(public_path));
 server.listen(config.port.app, () => {
-    console.log("Server is running on http://127.0.0.1:" + config.port.app);
+    format.log("server", `Server running on 127.0.0.1:${config.port.app}.`);
 });

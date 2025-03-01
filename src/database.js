@@ -8,29 +8,14 @@ db.pragma('journal_mode = WAL');
 const bcrypt = require("bcrypt");
 const salt_rounds = 10;
 
-const chunk_s = 32;
-
 // Adds a user to the database, with checks if it is a valid name and stuff
-function new_user(username, displayname, password) {
-    // Check length
-    if (username.length < 4 || username.length > 32)
-        return "Username length not valid.";
-
-    if (displayname.length > 32)
-        return "Display name is too long.";
-
-    // Check if another user already has username
-    const user_check = check_username(username);
-
-    if (!user_check)
-        return "Username taken.";
-
+function new_user(username, display_name, password) {
     // Hash password
     const hash = bcrypt.hashSync(password, salt_rounds);
 
     // Insert new user
-    const add_user = db.prepare("INSERT INTO users (username, displayname, password, profilepicture) VALUES (?, ?, ?, '/data/profile_pictures/default.png')");
-    let user = add_user.run(username, displayname, hash);
+    const add_user = db.prepare("INSERT INTO users (username, display_name, password, profile_picture) VALUES (?, ?, ?, '/data/profile_pictures/default.png')");
+    let user = add_user.run(username, display_name, hash);
 
     if (user.changes == 0)
         return "Database error. Please try again.";
@@ -42,12 +27,12 @@ function new_group() {
     return 0;
 }
 
-function new_message(channelid, authorid, content) {
+function new_message(channel_id, author_id, content) {
     if (content.length > 2048)
         return false;
 
-    const query = db.prepare("INSERT INTO messages (channelid, authorid, content) VALUES (?, ?, ?)");
-    let result = query.run(channelid, authorid, content);
+    const query = db.prepare("INSERT INTO messages (channel_id, author_id, content) VALUES (?, ?, ?)");
+    let result = query.run(channel_id, author_id, content);
 
     if (result.changes == 0)
         return false;
@@ -96,11 +81,11 @@ function get_messages(channelid) {
 // If dir is false, it reads messages BEFORE lastid
 // Else, if dir is true, it reads messages AFTER lastid
 // If no lastid is specified, it gets the newest chunk
-function get_message_chunk(channelid, dir = false, lastid) {
+function get_message_chunk(channel_id, dir = false, last_id, chunk_s) {
     // If empty, get newest
-    if (lastid == null) {
-        const query = db.prepare(`SELECT * FROM messages WHERE channelid = ? ORDER BY id DESC LIMIT ?`);
-        let result = query.all(channelid, chunk_s);
+    if (last_id == null) {
+        const query = db.prepare(`SELECT * FROM messages WHERE channel_id = ? ORDER BY id DESC LIMIT ?`);
+        let result = query.all(channel_id, chunk_s);
         if (result.length == 0) // If empty, return error
             return false;
 
@@ -108,8 +93,8 @@ function get_message_chunk(channelid, dir = false, lastid) {
     }
 
     // We need to find the chunk we are looking for
-    const query = db.prepare(`SELECT * FROM messages WHERE id ${dir ? ">" : "<"} ? AND channelid = ? ORDER BY id ${dir ? "ASC" : "DESC"} LIMIT ?`);
-    let result = query.all(lastid, channelid, chunk_s);
+    const query = db.prepare(`SELECT * FROM messages WHERE id ${dir ? ">" : "<"} ? AND channel_id = ? ORDER BY id ${dir ? "ASC" : "DESC"} LIMIT ?`);
+    let result = query.all(last_id, channel_id, chunk_s);
     if (result.length == 0) // If empty, return error
         return false;
 
@@ -120,10 +105,10 @@ function get_message_chunk(channelid, dir = false, lastid) {
     return result;
 }
 
-function get_message(messageid) {
+function get_message(message_id) {
     // Curently get all messages in a channel
     const query = db.prepare("SELECT * FROM messages WHERE id = ?");
-    let result = query.all(messageid);
+    let result = query.all(message_id);
 
     if (result.length != 0)
         return result;
@@ -138,21 +123,23 @@ function format_messages(messages) {
     let buffer = {};
 
     messages.forEach((message) => {
-        const authorid = message.authorid;
+        const author_id = message.author_id;
 
-        if (buffer[authorid]) {
+        if (buffer[author_id]) {
             // Use buffered data
-            message.author = buffer[authorid];
+            message.author = buffer[author_id];
         } else {
             // We need to find in the database
-            const user = get_user_info(authorid);
-            message.author = user.username;
-            buffer[authorid] = user.username;
+            const user = get_user_info(author_id);
+            const author = { "username": user.username, "display_name": user.display_name, "id": author_id };
+            
+            message.author = author;
+            buffer[author_id] = author;
         }
 
         // Clean up data for transmission
-        delete message.authorid;
-        delete message.channelid;
+        delete message.author_id;
+        delete message.channel_id;
     });
 
     return messages;

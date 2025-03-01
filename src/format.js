@@ -36,7 +36,14 @@ function links(str) {
     return str;
 }
 
+function log(source, text) {
+    process.stdout.write("\u001B[35m[" + source.toUpperCase() + "]\u001B[0m ");
+    console.log(text);
+    return;
+}
+
 module.exports = {
     escape_html,
-    links
+    links,
+    log
 }

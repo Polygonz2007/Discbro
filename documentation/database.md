@@ -8,8 +8,10 @@ The "users" table contains 4 datapoints:
 This id is used to refer to the user in the server. For example: if the user adds another user as a friend, and both accept, it is stored in
 the "friends" table as (id, user1, user2), where user1 and user2 are user id's. This number starts at 10000 and counts up.
 
-- username: The username of this account. Displayed as "@username", is can only contain lowercase letters a - z, and numbers 0 - 9.
-The username can NOT change. This is mainly used by the users to locate their friends on the app and add them as freinds.
+- username: The username of this account. Displayed as "@username", is can only contain lowercase letters a - z, numbers 0 - 9, dashes (-) and underscores (_).
+The username has to be atleast 4 characters long and cannot be more than 32 characters long.
+The username can NOT change. This is mainly used by the users to locate their friends on the app and add them as friends.
+For this purpouse the regular expression ^[a-z0-9-_]+$ is used, if no match is found the username is invalid.
 
 - displayname: The name displayed in most areas of the app, for this account. This dispayname can contain any letter / character the user wishes to use.
 This is mainly costemtic, but also what will be seen most places in the app.

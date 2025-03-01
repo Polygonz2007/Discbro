@@ -1,8 +1,4 @@
 body {
-    margin: 2vh 12vw;
-    background-color: var(--bar-color);
-    color: var(--text-color);
-
     justify-content: center;
     align-items: center;
 }
@@ -22,25 +18,8 @@ a {
     color: var(--link-text-color);
 }
 
-#logo {
-    margin-top: 9vh;
-    height: 10rem;
-    width: 76vw;
-}
-
 
 /* Form */
-form {
-    background-color: var(--pop-color);
-    width: 27rem;
-
-    margin: auto;
-    margin-top: var(--text-subtitle-size);
-    padding: 2rem 4rem;
-
-    box-sizing: border-box;
-}
-
 form > * {
     display: block;
 }
@@ -64,11 +43,4 @@ input[type=submit] {
 
 #info {
     font-size: var(--text-size-small);
-}
-
-/* For phones */
-@media all and (min-width:0px) and (max-width: 500px) {
-    :root {
-        zoom: 75%;
-    }
 }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Metadata -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/graphics/logo/error-white.svg">
+    <title>Not Found - Discbro</title>
+
+    <!-- CSS for all pages -->
+    <link rel="stylesheet" href="/theme.css" />
+    <link rel="stylesheet" href="/global.css" />
+
+    <!-- CSS for this page -->
+    <link rel="stylesheet" href="/info.css" />
+</head>
+
+<body>
+    <!-- Page -->
+    <a href="/"><img src="/graphics/logo/error-white.svg" id="logo" /></a>
+    <h3 id="subtitle">404 Not Found</h3>
+    
+    <p>The page you tried loading was not found.</p>
+    <p>Either, you lack the permissions to view it, or it simply does not exist.</p>
+    <br>
+    <a href="/">Return to main page</a>
+</body>
+
+<script>
+    const choices = ["404 Not Found", "Whoops...", "Yikes..!", "Uh oh!", "Sorry...", "Huh!?", "Nope...", "I can't find anything...", "Not here..."];
+    document.querySelector("#subtitle").innerText = choices[Math.floor(Math.random() * choices.length)];
+</script>
+
+</html>
