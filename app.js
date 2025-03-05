@@ -6,6 +6,7 @@ const config = {
 }
 
 ///  ?!?!?  ///
+require('dotenv').config()
 const fs = require("fs");
 
 ///  IMPORT  ///
@@ -23,7 +24,7 @@ const session = require("express-session");
 const path = require("path");
 
 const session_parser = session({
-    secret: 'mad_secret_bro',
+    secret: process.env.session_secret,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false } // If using HTTPS, set to true
@@ -125,29 +126,11 @@ app.use("*", (req, res) => {
         req.next();
 });
 
-/*for (let i = 0; i < 32768; i++) {
-    const user_id = Math.floor(Math.random() * 6) + 1; // from 1 to 7
-    const words = ["bro", "nah", "dap me up bro", "jeg er kul", "BRAGE", "sug universet", "hvem er du", "Frida", "dra din vei", "hei hei", "hade", "tullebukk", "du er smart du", "jada"];
-    const word_count = Math.floor(Math.random() * 10) + 1;
-    let message = "";
-
-    for (let i = 0; i < word_count; i++) {
-        message += words[Math.floor(Math.random() * words.length)] + " ";
-    }
-
-    database.new_message(1, user_id, message);
-}*/
-
 // Start server
 app.use(express.static(global.public_path));
 server.listen(config.port.app, () => {
     format.log("server", `Server running on 127.0.0.1:${config.port.app}.`);
 });
-
-
-
-
-
 
 
 

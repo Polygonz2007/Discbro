@@ -1,0 +1,7 @@
+src/discbro.db
+src/discbro.db-shm
+src/discrbo.db-wal
+
+node_modules
+
+.env
