@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%=displayname%> on Discbro</title>
+    <link rel="icon" type="image/x-icon" href="/graphics/logo/icon-white.svg">
+    <title>@<%=username%> on Discbro</title>
 
     <!-- CSS for all pages -->
     <link rel="stylesheet" href="/theme.css" />
@@ -13,8 +14,21 @@
     <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-    <img src="<%=profilepicture%>" />
-    <h1><%=displayname%></h1>
-    <h2><%=username%></h2>    
+    <div id="userbox">
+        <img src="<%=profile_picture%>" />
+
+        <div>
+            <h1><%=display_name%></h1>
+            <h2><%=username%> [ID: <%=id%>]</h2>
+            <p><%=bio%></p>
+        </div>
+    </div>
+
+    <p>The viewer is <%=viewer_id%></p>
+
+    <% if (id == viewer_id) { %>
+        <p>You are the goat!</p>
+    <% } %>
+    
 </body>
 </html>

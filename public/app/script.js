@@ -8,12 +8,16 @@ const body = doc.body;
 const socket = new WebSocket(url);
 
 let app = {
+	debug: false,
 	channel_id: 1,
 
 	max_chunks: 8, // Max number of chunks that can be loaded at once, configurable by user
 	chunk_s: 32, // size of each chunk
 	up_to_date: false, // If true, it means the newest available chunk is loaded
+	at_first: false, // If true, the first chunk in this channel is loaded
 	chunk_loading: false, // If true, a request is currently being handled. Do NOT make a new request while this is true
+
+	lock_newest: true, // if true, always scrolls down when something changes
 
 	chunk_index: 0, // incremented for each new chunk, used for unique index
 	oldest_chunk: 0, // when loading a chunk backward, update this
@@ -45,20 +49,30 @@ socket.addEventListener("open", (event) => {
 socket.addEventListener("message", (event) => {
 	// Parse, get, and check data
 	const data = JSON.parse(event.data);
-	console.log(data);
+	console.log(data)
 	const dir = data.dir; // false: older, true: newer
 	let messages = data.messages;
 	if (messages.length == 0) {
 		if (dir == true)
 			app.up_to_date = true;
+		else
+			app.at_first = true;
 
 		app.chunk_loading = false;
 		return;
 	}
 
+	// We only care about current channel
+	if (data.channel_id != app.channel_id)
+		return;
+
+	if (data.up_to_date)
+		app.up_to_date = true;
+
 	// Check if it is a lone message, not in a chunk
 	if (data.type == "message") {
 		// If up to date, we can either add to the newest chunk or make a new one if previous is full
+		console.log("Up to date: " + app.up_to_date);
 		if (!app.up_to_date)
 			return; // In the future, notify user of new messages on top of screen
 
@@ -66,12 +80,10 @@ socket.addEventListener("message", (event) => {
 		messages = format_datetime(messages);
 
 		let newest_chunk = get_chunk_by_id(app.newest_chunk);
-		console.log(newest_chunk.id);
-		if (newest_chunk.messages.length < app.chunk_s) {
+		if (newest_chunk && newest_chunk.messages.length < app.chunk_s) {
 			// Add message to newest chunk
 			newest_chunk.messages.push(messages[0]);
 			newest_chunk.newest_id = messages[0].id;
-			console.log("prev chunk: " + get_farthest_chunk_id(true, app.newest_chunk));
 			refresh_chunk(app.newest_chunk, get_farthest_chunk_id(true, app.newest_chunk));
 
 			scroll_to_bottom();
@@ -131,7 +143,7 @@ socket.addEventListener("message", (event) => {
 	// Previous, for combining messages by same author
 	const prev_chunk = get_chunk_by_id(dir ? app.newest_chunk : -1);
 	let prev;
-	if (prev_chunk)
+	if (prev_chunk && prev_chunk.id != chunk.id)
 		prev = get_message_by_id(prev_chunk.newest_id);
 
 	if (prev)
@@ -150,7 +162,6 @@ socket.addEventListener("message", (event) => {
 	// Remove old chunk (if necessary)
 	if (app.chunks.length > app.max_chunks) {
 		const to_unload = dir ? app.oldest_chunk : app.newest_chunk; // opposite of scrolling direction
-		console.log(`Unloading ${to_unload} because of new chunk in direction ${dir ? "new" : "old"}!\nOldest: ${app.oldest_chunk}, newest: ${app.newest_chunk}`);
 		remove_chunk(to_unload);
 	}
 
@@ -175,7 +186,7 @@ function sendMessage() {
 		return; // cant send empty message
 
 	// Send
-	const data = { "type": "send", "content": content };
+	const data = { "type": "send_message", "channel_id": app.channel_id, "content": content };
 	const send = JSON.stringify(data);
 
 	socket.send(send);
@@ -198,13 +209,15 @@ function get_chunk(dir = false) {
 	if (chunk) // but if we already have a chunk we find based off that
 		message_id = dir ? chunk.newest_id : chunk.oldest_id;
 
-	let data = { "type": "get", "channel_id": app.channel_id, "dir": dir, "last_id": message_id, "chunk_s": app.chunk_s };
+	let data = { "type": "get_chunk", "channel_id": app.channel_id, "dir": dir, "last_id": message_id, "chunk_s": app.chunk_s };
 	data = JSON.stringify(data);
 
 	socket.send(data);
 }
 
 function add_chunk(prev, dir, id) {
+	console.log(`Adding chunk ${id} in the direction ${dir ? "new" : "old"}.`);
+
 	// Create chunk div
 	const chunk = doc.createElement("div");
 	chunk.classList = "chunk";
@@ -216,14 +229,13 @@ function add_chunk(prev, dir, id) {
 		body.append(chunk);
 	else
 		body.insertBefore(chunk, doc.querySelector("#C" + app.oldest_chunk));
-		
-	console.log(`I am chunk ${id} and my direction is ${dir ? "after" : "before"} all other chunks! ${dir ? "" : `I was placed after chunk C${app.oldest_chunk}`}`);
-	console.log(`The previous message is ${prev ? prev.content : ""}`);
 
-	const r = Math.floor(Math.random() * 255);
-	const g = Math.floor(Math.random() * 255);
-	const b = Math.floor(Math.random() * 255);
-	chunk.style.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.2)`;
+	if (app.debug) {
+		const r = Math.floor(Math.random() * 255);
+		const g = Math.floor(Math.random() * 255);
+		const b = Math.floor(Math.random() * 255);
+		chunk.style.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.2)`;
+	}
 
 	return id;
 }
@@ -236,7 +248,6 @@ function refresh_chunk(id, prev_id) {
 	let prev;
 	if (prev_id != null) {
 		const prev_c = get_chunk_by_id(prev_id);
-		console.log(prev_c.newest_id)
 		prev = get_message_by_id(prev_c.newest_id);
 	}
 	
@@ -264,14 +275,14 @@ function remove_chunk(id) {
 
 	if (id == app.newest_chunk)
 		app.up_to_date = false;
+	if (id == app.oldest_chunk)
+		app.at_first = false;
 
 	// Update oldest / newest
 	if (app.oldest_chunk == id)
 		app.oldest_chunk = get_farthest_chunk_id(false);
 	else if (app.newest_chunk == id)
 		app.newest_chunk = get_farthest_chunk_id(true);
-
-	console.log(`Updated, newest ${app.newest_chunk}, oldest ${app.oldest_chunk}`);
 }
 
 function write_messages(chunk, id, prev) {
@@ -280,25 +291,49 @@ function write_messages(chunk, id, prev) {
 
 	// Write messages into it
 	for (let i = 0; i < messages.length; i++) {
-		// Write into messages div
+		// Get
 		const current = messages[i];
-		if (prev && current.author.id == prev.author.id && (current.time - prev.time < (60 * 5))) { // same author, and less than 5 minutes ago
+		const current_time = new Date(current.time * 1000);
+		let prev_time;
+		let same_day = false;
+		let same_author = false;
+		let time_seperation = false;
+
+		// Write date seperator
+		if (prev) {
+			prev_time = new Date(prev.time * 1000);
+
+			if (prev && current_time.getDay() == prev_time.getDay())
+				same_day = true;
+		}
+
+		if (!same_day || !prev)
+			chunk.innerHTML += `<span>${current_time.toLocaleDateString('en-GB', {month: 'long', day: 'numeric', year: 'numeric'})}</span>`;
+
+		// Get extra format data
+		const highlight = (current.highlight) ? "highlight" : "";
+
+		// Write into messages div
+		if (prev) { // has to be same author, less than 5 minutes ago, and same day to combine
+			same_author = current.author.id == prev.author.id;
+			time_seperation = (current.time - prev.time < (60 * 5));
+		}
+
+		if (same_author && time_seperation && same_day) {
 			chunk.innerHTML  += 
-			`<div class="message detached" id="M${current.id}" >
+			`<div class="message detached ${highlight}" id="M${current.id}" >
 					<p class="content detached">${current.content}</p>
 			</div>`;
-
 		} else {
 			chunk.innerHTML  += 
-			`<div class="message" id="M${current.id}" >
-				<a href="/app/user/${current.author.id}"><img src="/data/profile_pictures/default.png"></img></a>
+			`<div class="message ${highlight}" id="M${current.id}" >
+				<a href="/app/user/${current.author.id}"><img src="/data/profile_pictures/default.png" class="pfp"></img></a>
 				<div>
 					<a class="author" href="/app/user/${current.author.id}">${current.author.display_name} [@${current.author.username}]</a>
 					<p class="timestamp">${current.time_date}</p>
 					<p class="content">${current.content}</p>
 				</div>
 			</div>`;
-
 		}
 
 		prev = current;
@@ -307,10 +342,16 @@ function write_messages(chunk, id, prev) {
 	return true;
 }
 
-root.setAttribute("theme", "midnight");
+root.setAttribute("theme", "dark");
 //scroll(0, Infinity);
 
-window.addEventListener("scroll", () => {
+window.addEventListener("scroll", (e) => {
+	console.log(e);
+
+	// get and store previous size of window
+	// and scroll
+	// if you were at bottom but no longer, scroll down
+
 	// Get chunks we care about
 	const oldest = doc.querySelector("#C" + app.oldest_chunk);
 	const newest = doc.querySelector("#C" + app.newest_chunk);
@@ -320,7 +361,7 @@ window.addEventListener("scroll", () => {
 
 	// If they are visible, load new chunk in that direction
 	// If we cant load a newer one, set "up_to_date" to true so we dont spam server with requests
-	if (oldest) {
+	if (oldest && !app.at_first) {
 		const oldest_view = oldest.getBoundingClientRect();
 		const oldest_boundary = oldest_view.y + oldest_view.height;
 
@@ -388,11 +429,8 @@ function get_farthest_chunk_id(dir, ignore_id) {
 		let current_id = 0;
 		let current_chunk_id = null;
 
-		console.log("finding newest without " + ignore_id)
-
 		for (let i = 0; i < app.chunks.length; i++) {
 			const chunk = app.chunks[i];
-			console.log(`checking ${chunk.id}, with its ${chunk.newest_id} compared to the current winner of ${current_id} (chunk ${current_chunk_id})`);
 			if (chunk.newest_id > current_id && chunk.id != ignore_id) {
 				current_id = chunk.newest_id;
 				current_chunk_id = chunk.id;

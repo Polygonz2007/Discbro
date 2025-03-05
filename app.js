@@ -1,7 +1,8 @@
 
 ///  CONFIG  ///
 const config = {
-    port: { websocket: 2337, app: 2338 }, // used for both websocket and app
+    port: { websocket: 2337, app: 80 }, // used for both websocket and app
+    rate_limit: 100 // minimum time (ms) between each request per user 
 }
 
 ///  ?!?!?  ///
@@ -29,6 +30,8 @@ const session_parser = session({
 });
 
 const app = express();
+app.set('trust proxy', true);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // To parse urlencoded parameters
 app.use(session_parser);
@@ -36,17 +39,17 @@ app.use(session_parser);
 app.all("/app/*", account.check_login); // Make sure no gets or posts happen without being logged in
 
 // Get
-app.get("/app/user/:userid", page.profile); 
+app.get("/app/user/:user_id", page.profile); 
 //app.get("/app", page.app);
 
 // Post
 app.post("/login", account.login); // Allow users to log in, check if the credentials are correct and if they are update session
 app.post("/create-account", account.create_account);
 
-const public_path = path.join(__dirname, "public");
+global.public_path = path.join(__dirname, "public");
 
 // EJS
-app.set('views', path.join(public_path, "app"));
+app.set('views', path.join(global.public_path, "app"));
 app.set('view engine','ejs');
 
 // HTTP
@@ -62,10 +65,10 @@ format.log("server", `WebSocket server created.`);
 server.on('upgrade', function (request, socket, head) {
     socket.on('error', console.error);
 
-    format.log("websocket", `Connecting to ${request.rawHeaders[1]}`);
+    format.log("websocket", `Connecting to ${request.socket.remoteAddress}`);
 
     session_parser(request, {}, () => {
-        if (!request.session.userid) {
+        if (!request.session.user_id) {
             socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
             socket.destroy();
             return;
@@ -80,14 +83,32 @@ server.on('upgrade', function (request, socket, head) {
 });
 
 wss.on('connection', (ws, req) => {
-    ws.on('message', (data, isBinary) => {
+    format.log("websocket", `Connected to ${req.socket.remoteAddress} successfully!`);
+
+    req.session.last_time = Date.now();
+
+    ws.on('message', async (data, isBinary) => {
+        // Translate
         data = isBinary ? data : data.toString();
         data = JSON.parse(data);
 
+        // Rate limit
+        // Doesnt really work, but, good enough for now.
+        // Make counter system instead (available requests vs. completed requests, +1 av. every someting)
+        const diff = Date.now() - req.session.last_time;
+        if (diff < config.rate_limit)
+            await delay(config.rate_limit - diff);
+
+        req.session.last_time = Date.now();
+
+        // Functions
         const type = data.type;
         switch (type) {
-            case "send": websocket.ws_send(data, req, ws); return;
-            case "get": websocket.ws_get(data, req, ws); return;
+            case "send_message": websocket.send_message(data, req, ws); return;
+
+            case "get_chunk": websocket.get_chunk(data, req, ws); return;
+            case "get_channels": websocket.get_channels(data, req, ws); return;
+            case "get_channel": websocket.get_channel(data, req, ws); return;
         }
     });
 
@@ -98,14 +119,37 @@ wss.on('connection', (ws, req) => {
 
 // Not found page
 app.use("*", (req, res) => {
-    if (!fs.existsSync(path.join(public_path, req.baseUrl)))
-        res.sendFile(path.join(public_path, "/util/not-found.html"));
+    if (!fs.existsSync(path.join(global.public_path, req.baseUrl)))
+        res.sendFile(path.join(global.public_path, "/util/not-found.html"));
     else
         req.next();
 });
 
+/*for (let i = 0; i < 32768; i++) {
+    const user_id = Math.floor(Math.random() * 6) + 1; // from 1 to 7
+    const words = ["bro", "nah", "dap me up bro", "jeg er kul", "BRAGE", "sug universet", "hvem er du", "Frida", "dra din vei", "hei hei", "hade", "tullebukk", "du er smart du", "jada"];
+    const word_count = Math.floor(Math.random() * 10) + 1;
+    let message = "";
+
+    for (let i = 0; i < word_count; i++) {
+        message += words[Math.floor(Math.random() * words.length)] + " ";
+    }
+
+    database.new_message(1, user_id, message);
+}*/
+
 // Start server
-app.use(express.static(public_path));
+app.use(express.static(global.public_path));
 server.listen(config.port.app, () => {
     format.log("server", `Server running on 127.0.0.1:${config.port.app}.`);
 });
+
+
+
+
+
+
+
+
+// move to different file
+const delay = ms => new Promise(res => setTimeout(res, ms));

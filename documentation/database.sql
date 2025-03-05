@@ -1,7 +1,7 @@
 create table users (
     -- Account data
    id INTEGER PRIMARY KEY AUTOINCREMENT,
-   username varchar(32), -- @username, can only conatin a-z, 0 - 9, underscore and dash. ^[a-z0-9-_]+$ has to be unique, and atleast 4 characters long.
+   username varchar(32), -- @username, can only conatin a-z, 0 - 9. has to be unique, and atleast 4 characters long.
    display_name varchar(48), -- displayname, can contain any character
    password varchar(60), -- 60 for hash
 
@@ -23,21 +23,44 @@ create table friends (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user1_id UNSIGNED INT NOT NULL, -- user1 is the one who sent the request
     user2_id UNSIGNED INT NOT NULL,
-    status UNSIGNED INT -- 0: pending, 1: accepted
+    status TINYINT -- 0: pending, 1: accepted
+);
+
+create table servers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name varchar(64) NOT NULL,
+    icon varchar(128), -- if null, use default smiling icon
+
+    created_time UNSIGNED INT NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+create table members (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    server_id UNSIGNED INT REFERENCES servers(id),
+    user_id USNIGNED INT REFERENCES users(id)
+);
+
+create table categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name varchar(63) NOT NULL,
+    
+    server_id UNSIGNED INT REFERENCES servers(id)
 );
 
 create table channels (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name varchar(127) NOT NULL
+    name varchar(63) NOT NULL,
+    
+    server_id UNSIGNED INT NOT NULL REFERENCES servers(id),
+    category_id UNSIGNED INT REFERENCES category(id), -- can be category-less, and just in a server
+    created_time UNSIGNED INT NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
 create table messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    channel_id UNSIGNED INT NOT NULL,
-    author_id INT NOT NULL,
-    content varchar(2048) NOT NULL,
-    time UNSIGNED INT NOT NULL DEFAULT (strftime('%s', 'now')),
+    channel_id UNSIGNED INT NOT NULL REFERENCES channels(id),
+    author_id INT NOT NULL REFERENCES users(id),
 
-    FOREIGN KEY (author_id) REFERENCES users(id),
-    FOREIGN KEY (channel_id) REFERENCES channels(id)
+    content varchar(2048) NOT NULL,
+    time UNSIGNED INT NOT NULL DEFAULT (strftime('%s', 'now'))
 );

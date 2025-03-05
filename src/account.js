@@ -6,7 +6,7 @@ const database = require("./database.js");
 const bcrypt = require("bcrypt");
 
 function check_login(req, res, next) {
-    if (req.session.userid)
+    if (req.session.user_id)
         return next();
     else
         return res.redirect("/login");
@@ -28,7 +28,7 @@ function login(req, res) {
         return res.send({"error": "Username or password is incorrect."});
     
     // Correct, let them in
-    req.session.userid = id;
+    req.session.user_id = id;
 
     format.log("account", `User @${user.username} [ID: ${user.id}] logged in successfully.`);
 
@@ -38,8 +38,6 @@ function login(req, res) {
 
 function create_account(req, res) {
     const data = req.body;
-
-    console.log(data);
 
     // Check there is anything at all
     if (!data.username || !data.password)
@@ -68,9 +66,13 @@ function create_account(req, res) {
     if (!new_user)
         return res.send({"error": new_user});
 
+    format.log("account", `Account @${new_user.username} [ID: ${new_user.id}] created successfully.`);
+
     // Get new id and log in
     const id = database.check_username(data.username);
-    req.session.userid = id;
+    req.session.user_id = id;
+
+    format.log("account", `User @${new_user.username} [ID: ${new_user.id}] logged in successfully.`);
 
     // Send to app
     return res.redirect("/app");

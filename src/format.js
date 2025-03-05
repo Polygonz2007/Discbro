@@ -24,20 +24,16 @@ function escape_html(str) {
 }
 
 function links(str) {
-    const reg = new RegExp("https:\/\/([^\s]+)");
-    console.log(str);
-
-    //while (str.match(reg)) {
-    if (str.match(reg)) {
-        let link = str.match(reg);
-        const formatted = "<a>" + link[0] + "</a>";
-    }
+    // Images
+    const img_reg = /(https:\/\/([^\s]+))/g;
+    str = str.replace(img_reg, `<img src="$1"/><br>`);
 
     return str;
 }
 
 function log(source, text) {
-    process.stdout.write("\u001B[35m[" + source.toUpperCase() + "]\u001B[0m ");
+    const date = new Date();
+    process.stdout.write("[" + date.toLocaleTimeString() + "] \u001B[35m[" + source.toUpperCase() + "]\u001B[0m ");
     console.log(text);
     return;
 }

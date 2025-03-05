@@ -116,11 +116,12 @@ function get_message(message_id) {
     return false;
 }
 
-function format_messages(messages) {
+function format_messages(messages, user_id) {
     if (!messages)
         return false;
 
     let buffer = {};
+    const user = get_user_info(user_id);
 
     messages.forEach((message) => {
         const author_id = message.author_id;
@@ -137,9 +138,13 @@ function format_messages(messages) {
             buffer[author_id] = author;
         }
 
+        const search_str = " " + message.content + " ";
+        if ((user && search_str.indexOf(` @${user.username} `) != -1) || search_str.indexOf(` @everyone `) != -1)
+            message.highlight = true;
+
         // Clean up data for transmission
-        delete message.author_id;
-        delete message.channel_id;
+        delete message.author_id; // already in author
+        delete message.channel_id; // already in chunk
     });
 
     return messages;
@@ -163,14 +168,34 @@ function delete_user(username) {
     return true;
 }
 
+function get_channels(server_id, user_id) {
+    // For now just returns all channels
+    // But eventually, returns all channels in a server the user has access to
+    const query = db.prepare("SELECT id, name FROM channels");
+    const channels = query.all();
+    if (channels.length == 0)
+        return false;
+
+    return channels;
+}
+
+function get_channel(id) {
+    const query = db.prepare("SELECT id, name, created_time FROM channels WHERE id = ?");
+    const channel = query.get(id);
+    if (channel.length == 0)
+        return false;
+
+    return channel;
+}
+
 module.exports = {
     new_user,
     check_username,
     get_user_info,
     delete_user,
 
-    new_group,
-    get_group_members,
+    get_channel,
+    get_channels,
     
     new_message,
 

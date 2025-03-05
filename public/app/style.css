@@ -16,6 +16,7 @@ body {
 
     margin-bottom: calc(var(--message-box-height) + var(--segment-padding));
     margin-left: calc(var(--sidebar-width) + var(--segment-padding));
+    margin-right: var(--segment-padding);
 }
 
 /* Transistions for themes */
@@ -50,7 +51,7 @@ p {
     margin-top: 0.5rem;
 
     color: var(--light-text-color);
-    transition-property: padding-left;
+    transition-property: background-color, padding-left;
     transition-duration: 0.3s;
     transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
 }
@@ -61,8 +62,21 @@ div.detached {
     padding-bottom: 0.4rem;
 }
 
+h1 {
+    margin-top: var(--text-title-size);
+    margin-bottom: 0;
+    padding-left: calc(var(--message-padding-left) / 2);
+}
+
+h3 {
+    color: var(--light-text-color);
+    font-weight: normal;
+    padding-left: calc(var(--message-padding-left) / 2);
+    margin-top: 0;
+}
+
 p.detached {
-    padding-left: 3.4rem;
+    padding-left: var(--message-padding-left);
 }
 
 .message > * {
@@ -86,6 +100,23 @@ p.detached {
     padding-left: 0.1rem;
     color: var(--weak-text-color);
     font-size: var(--text-size-small);
+}
+
+span {
+    display: inline-block;
+    height: 1rem;
+    width: calc(100% - var(--message-padding-left));
+
+    text-align: left;
+    color: var(--weak-text-color);
+    font-size: var(--text-size-small);
+    font-weight: bold;
+
+    border-bottom: 0.12rem solid var(--weak-text-color);
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+
+    padding-left: var(--message-padding-left);
 }
 
 #message-box {
@@ -125,13 +156,23 @@ a:hover {
     text-decoration: underline;
 }
 
-img {
+img.pfp {
     height: 2.5rem;
     width: 2.5rem;
     padding-top: 0.25em;
     aspect-ratio: 1;
+    border-radius: 0;
+    margin-top: 0;
 
     vertical-align: top;
+}
+
+img {
+    max-width: 32em;
+    max-height: 20em;
+
+    border-radius: 0.25rem;
+    margin-top: 0.1rem;
 }
 
 input[type=checkbox] {

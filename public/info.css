@@ -1,9 +1,7 @@
 body {
     justify-content: center;
     align-items: center;
-}
 
-h1, h2, h3, h4, h5, h6, p, a {
     text-align: center;
 }
 
@@ -21,6 +19,11 @@ h3 {
 
 a {
     color: var(--link-text-color);
+}
+
+::placeholder {
+    opacity: 1;
+    color: red;
 }
 
 #subtitle {
