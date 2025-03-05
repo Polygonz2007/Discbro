@@ -1,6 +1,6 @@
 src/discbro.db
 src/discbro.db-shm
-src/discrbo.db-wal
+src/discbro.db-wal
 
 node_modules
 
