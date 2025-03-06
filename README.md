@@ -10,8 +10,8 @@ Because I want to
 Using the things we are learning to use at school
 
 ## Features
-- Automatically sets up an empty database on first run
-- Account system with encrypted passwords (no https tho yes so kinda useless)
+- Automatically sets up an empty database when none is present (automatic setup)
+- Account system with encrypted passwords (no https tho yet so kinda useless)
 - Real time messaging using websockets, with chunk loading system for performance and functionality
 - Channels
 - Friends, customizable themes,
