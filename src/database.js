@@ -1,12 +1,28 @@
 
 // This module is responsible for handling database interaction by the app, in a safe and proper way.
 
+const fs = require("fs");
+
 const sqlite3 = require('better-sqlite3');
 const db = sqlite3('./src/discbro.db');
 db.pragma('journal_mode = WAL');
 
 const bcrypt = require("bcrypt");
 const salt_rounds = 10;
+
+// Setup the database
+function setup() {
+    const setup_file = "./documentation/database.sql";
+    const setup_string = fs.readFileSync(setup_file).toString();
+
+    const queries = setup_string.split(";");
+
+    for (let i = 0; i < queries.length - 1; i++) { // everything except last empty query
+        db.prepare(queries[i]).run();
+    }
+
+    return 0;
+}
 
 // Adds a user to the database, with checks if it is a valid name and stuff
 function new_user(username, display_name, password) {
@@ -189,6 +205,8 @@ function get_channel(id) {
 }
 
 module.exports = {
+    setup,
+
     new_user,
     check_username,
     get_user_info,

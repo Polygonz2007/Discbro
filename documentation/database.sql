@@ -15,7 +15,9 @@ create table users (
     -- default profile picture is "default.png" which is the discbro logo with colors behind it
     -- every profile picture should be max 256x256
 
-    theme TINYINT -- 0: default, 1: midnight, 2: light, more to be added
+    theme TINYINT, -- 0: default, 1: midnight, 2: light, more to be added
+
+    created_time UNSIGNED INT NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
 create table friends (
@@ -37,7 +39,9 @@ create table servers (
 create table members (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     server_id UNSIGNED INT REFERENCES servers(id),
-    user_id USNIGNED INT REFERENCES users(id)
+    user_id USNIGNED INT REFERENCES users(id),
+
+    joined_time UNSIGNED INT NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
 create table categories (
@@ -52,7 +56,7 @@ create table channels (
     name varchar(63) NOT NULL,
     
     server_id UNSIGNED INT NOT NULL REFERENCES servers(id),
-    category_id UNSIGNED INT REFERENCES category(id), -- can be category-less, and just in a server
+    category_id UNSIGNED INT REFERENCES categories(id), -- can be category-less, and just in a server
     created_time UNSIGNED INT NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
@@ -64,3 +68,7 @@ create table messages (
     content varchar(2048) NOT NULL,
     time UNSIGNED INT NOT NULL DEFAULT (strftime('%s', 'now'))
 );
+
+-- Init
+insert into servers (name) values ('Global');
+insert into channels (name, server_id) values ('channel 1', 1);

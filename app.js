@@ -2,12 +2,33 @@
 ///  CONFIG  ///
 const config = {
     port: { websocket: 2337, app: 80 }, // used for both websocket and app
-    rate_limit: 100 // minimum time (ms) between each request per user 
+    rate_limit: 100, // minimum time (ms) between each request per user 
+    database_path: "./src/discbro.db"
 }
 
-///  ?!?!?  ///
+///  Prerequisites and tests  ///
 require('dotenv').config()
 const fs = require("fs");
+
+// Check if database is present, if not, create one (.gitignore)
+if (!fs.existsSync(config.database_path)) {
+    console.log("Database not present, creating one...");
+    fs.openSync(config.database_path, "w");
+
+    const database = require("./src/database.js");
+    const result = database.setup();
+
+    if (result != 0) {
+        fs.unlink(config.database_path, (err) => {
+            console.log("Error deleting database file, do it manually instead.");
+        });
+
+        throw new Error("Database could net be set up properly. Aborting!");
+    }
+
+    console.log("Database sucessfullt initiated.");
+}
+
 
 ///  IMPORT  ///
 const format = require("./src/format.js");
@@ -15,7 +36,6 @@ const database = require("./src/database.js");
 const account = require("./src/account.js");
 const page = require("./src/page.js");
 const websocket = require("./src/websocket.js");
-
 
 ///  SETUP  ///
 // Express + routing
