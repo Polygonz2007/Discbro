@@ -9,6 +9,10 @@ form {
     text-align: left;
 }
 
+input[type=submit] {
+    margin-top: var(--text-title-size);
+}
+
 h1 {
     font-size: var(--text-title-size);
 }
@@ -22,8 +26,7 @@ a {
 }
 
 ::placeholder {
-    opacity: 1;
-    color: red;
+    opacity: 0.5;
 }
 
 #subtitle {

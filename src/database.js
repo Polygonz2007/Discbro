@@ -30,7 +30,7 @@ function new_user(username, display_name, password) {
     const hash = bcrypt.hashSync(password, salt_rounds);
 
     // Insert new user
-    const add_user = db.prepare("INSERT INTO users (username, display_name, password, profile_picture) VALUES (?, ?, ?, '/data/profile_pictures/default.png')");
+    const add_user = db.prepare("INSERT INTO users (username, display_name, password, profile_picture) VALUES (?, ?, ?, '/data/profile-sqpictures/default.png')");
     let user = add_user.run(username, display_name, hash);
 
     if (user.changes == 0)

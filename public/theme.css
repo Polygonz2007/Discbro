@@ -7,8 +7,10 @@
     --segment-padding: 0.3rem;
 
     --message-padding-left: 3.65rem;
-
     --message-view-width: calc(100% - var(--sidebar-width));
+
+    --user-box-height: 4rem;
+    --user-box-img-size: calc(var(--user-box-height) - var(--segment-padding) * 2);
 
     /* Text */
     --text-font: "Consolas";
@@ -20,9 +22,9 @@
     --text-subtitle-size: 1.7rem;
 
     /* Colors */
-    --background-color: #123; /* 123 */
-    --pop-color: #345; /* 345 */
-    --bar-color: #234; /* 234 */
+    --back-color: #123; /* 123 */
+    --middle-color: #234; /* 234 */
+    --top-color: #345; /* 345 */
     --selected-color: #DDD;
 
     --text-color: #FFF;
@@ -32,12 +34,19 @@
 
     --highlight-color: #AA57;
     --error-color: #A55;
+
+    /* Status colors */
+    --status-1-col: #5A5; /* Online */
+    --status-2-col: #AA5; /* Inactive */
+    --status-3-col: #A55; /* Do Not Disturb */
+    --status-4-col: #55A; /* Do Disturb (inactive) */
+    --status-5-col: #5AA; /* Do Disturb (active) */
 }
 
 :root[theme=midnight] {
-    --background-color: #000; /* 123 */
-    --pop-color: #222; /* 345 */
-    --bar-color: #111; /* 234 */
+    --back-color: #000; /* 123 */
+    --middle-color: #111; /* 234 */
+    --top-color: #222; /* 345 */
     
     --text-color: #DDD;
     --light-text-color: #DDDE;
@@ -48,14 +57,14 @@
 }
 
 :root[theme=light] {
-    --background-color: #EEE; /* 123 */
-    --pop-color: #FFF; /* 345 */
-    --bar-color: #F8F8F8; /* 234 */
+    --back-color: #EEE; /* 123 */
+    --middle-color: #F8F8F8; /* 234 */
+    --top-color: #FFF; /* 345 */
 
     --text-color: #000;
     --light-text-color: #000E;
     --weak-text-color: #0007;
-    --link-text-color: #234;
+    --link-text-color: #55A;
 
     --highlight-color: #EE37;
 }

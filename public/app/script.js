@@ -327,7 +327,7 @@ function write_messages(chunk, id, prev) {
 		} else {
 			chunk.innerHTML  += 
 			`<div class="message ${highlight}" id="M${current.id}" >
-				<a href="/app/user/${current.author.id}"><img src="/data/profile_pictures/default.png" class="pfp"></img></a>
+				<a href="/app/user/${current.author.id}"><img src="/data/profile-pictures/default.png" class="pfp"></img></a>
 				<div>
 					<a class="author" href="/app/user/${current.author.id}">${current.author.display_name} [@${current.author.username}]</a>
 					<p class="timestamp">${current.time_date}</p>
@@ -342,7 +342,7 @@ function write_messages(chunk, id, prev) {
 	return true;
 }
 
-root.setAttribute("theme", "dark");
+root.setAttribute("theme", "light");
 //scroll(0, Infinity);
 
 window.addEventListener("scroll", (e) => {

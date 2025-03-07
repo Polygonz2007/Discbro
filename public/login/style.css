@@ -37,10 +37,6 @@ input {
     margin-top: 0.5rem;
 }
 
-input[type=submit] {
-    margin-top: var(--text-subtitle-size);
-}
-
 #info {
     font-size: var(--text-size-small);
 }

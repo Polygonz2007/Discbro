@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
 
-    background-color: var(--background-color);
+    background-color: var(--back-color);
     color: var(--text-color);
 }
 
@@ -22,8 +22,8 @@ form {
     align-items: center;
     text-align: left;
 
-    background-color: var(--bar-color);
-    border: solid var(--pop-color) 0.5rem;
+    background-color: var(--middle-color);
+    border: solid var(--top-color) 0.5rem;
 
     width: 27rem;
     margin: auto;
@@ -54,10 +54,20 @@ label {
     align-self: normal;
 }
 
-#logo {
+.logo {
     margin: 0 10vw;
     margin-top: 10vh;
 
     height: 10rem;
     width: 80vw;
+}
+
+
+
+/* Light Mode Icons */
+:root[theme="light"] {
+    img.icon {
+        filter: brightness(0);
+    }
+    
 }

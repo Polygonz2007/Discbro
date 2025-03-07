@@ -5,7 +5,7 @@
     <!-- Metadata -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="/graphics/logo/icon-white.svg">
+    <link rel="icon" type="image/x-icon" href="/graphics/logo/icon.svg">
     <title>Discbro</title>
 
     <!-- CSS for all pages -->
@@ -22,14 +22,26 @@
         <p>Logged in as <i>NAHHHH</i></p>
         <h2>Channels</h2>
 
-        <ul>
-            <li>global</li>
-        </ul>
+        <div id="channels">
+            <p>channel 1</p>
+        </div>
 
-        <input type="button" id="send" value="Send message" />
+        <div id="user">
+            <img src="/data/profile-pictures/default.png" />
+            
+            <div>
+                <p id="displayname">Polygonz</p>
+                <p id="username">@polygonz2007</p>
+                <p id="status">Online</p>
+            </div>
+
+            <a>
+                <img src="/graphics/logo/icon.svg" class="icon">
+            </a>
+        </div>
     </div>
 
-    <h1>The beginning of <i>Channel #${app.channel_id}</i></h1><br><h3>This channel was created bleh and has 893721 messages in total.</h3>
+    <h1>The beginning of <i>Channel 1</i></h1><br><h3>This channel was created 07.03.2025 and has 17 messages in total.</h3>
 
     <input type="text" id="message-box" placeholder="Write your message here..." />
 

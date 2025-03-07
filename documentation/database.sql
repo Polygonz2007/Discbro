@@ -6,7 +6,7 @@ create table users (
    password varchar(60), -- 60 for hash
 
    -- Fun stuff
-   status UNSIGNED INT, -- 0: offline, 1: online, 2: AFK, 3: do not disturb, 4: disturb (wants to talk to someone)
+   status UNSIGNED INT, -- 0: offline, 1: online, 2: inactive, 3: do not disturb, 4: disturb (wants to talk to someone)
                         -- 0: gray, 1: green, 2: yellow, 3: red, 4: cyan
    status_text varchar(64), -- any text that shows on profile temporarily
    bio varchar(128), -- user describes themselves

@@ -10,20 +10,13 @@ body {
     font-family: var(--text-font);
     font-size: var(--text-size);
     color: var(--text-color);
-    background-color: var(--background-color);
+    background-color: var(--back-color);
 
     overscroll-behavior: none;
 
     margin-bottom: calc(var(--message-box-height) + var(--segment-padding));
     margin-left: calc(var(--sidebar-width) + var(--segment-padding));
     margin-right: var(--segment-padding);
-}
-
-/* Transistions for themes */
-* {
-    transition-property: background-color, color;
-    transition-duration: 0.4s;
-    transition-timing-function: ease-out;
 }
 
 input {
@@ -37,7 +30,7 @@ input {
 
     border: none;
     border-radius: 0;
-    background-color: var(--pop-color);
+    background-color: var(--top-color);
 }
 
 p {
@@ -85,7 +78,7 @@ p.detached {
 }
 
 .message:hover {
-    background-color: var(--pop-color);
+    background-color: var(--top-color);
     padding-left: 0.3rem;
 }
 
@@ -113,7 +106,7 @@ span {
     font-weight: bold;
 
     border-bottom: 0.12rem solid var(--weak-text-color);
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     margin-bottom: 0;
 
     padding-left: var(--message-padding-left);
@@ -126,7 +119,7 @@ span {
 
     bottom: 0; left: var(--sidebar-width);
 
-    background-color: var(--pop-color);
+    background-color: var(--top-color);
     outline: none;
 }
 
@@ -143,7 +136,7 @@ span {
     padding: var(--segment-padding);
     box-sizing: border-box;
 
-    background-color: var(--bar-color);
+    background-color: var(--middle-color);
 }
 
 a {
@@ -178,6 +171,58 @@ img {
 input[type=checkbox] {
     height: 1rem;
 }
+
+
+/**  USER BOX  **/
+#user {
+    position: absolute;
+    display: flex;
+
+    height: var(--user-box-height);
+    width: calc(var(--sidebar-width) - var(--segment-padding) * 2); 
+
+    bottom: var(--segment-padding);
+
+    background-color: var(--top-color);
+}
+
+#user > * {
+    display: flex;
+    flex-basis: var(--user-box-img-size);
+}
+
+#user > div {
+    flex-grow: 2;
+    display: block;
+}
+
+#user > img {
+    margin: var(--segment-padding);
+    width: var(--user-box-img-size);
+    height: var(--user-box-img-size);
+}
+
+
+#displayname {
+    font-size: var(--text-size);
+}
+
+#username {
+    font-size: var(--text-size-small);
+    color: var(--weak-text-color);
+}
+
+#status {
+    font-size: var(--text-size-small);
+    bottom: 0;
+}
+
+
+/* Interactive stuff */
+.img-btn { /* On hover, shows alt text above and lets you click it and stuff */
+    width: 0;
+}
+
 
 /* For mobile devices */
 @media all and (min-width:0px) and (max-width: 670px) {
