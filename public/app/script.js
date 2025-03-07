@@ -342,9 +342,6 @@ function write_messages(chunk, id, prev) {
 	return true;
 }
 
-root.setAttribute("theme", "light");
-//scroll(0, Infinity);
-
 window.addEventListener("scroll", (e) => {
 	console.log(e);
 

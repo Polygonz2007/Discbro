@@ -63,6 +63,10 @@ app.all("/app/*", account.check_login); // Make sure no gets or posts happen wit
 app.get("/app/user/:user_id", page.profile); 
 //app.get("/app", page.app);
 
+app.get("/api/get-theme", (req, res) => {
+    res.send(JSON.stringify({"theme": "midnight"}));
+})
+
 // Post
 app.post("/login", account.login); // Allow users to log in, check if the credentials are correct and if they are update session
 app.post("/create-account", account.create_account);
@@ -86,8 +90,6 @@ format.log("server", `WebSocket server created.`);
 server.on('upgrade', function (request, socket, head) {
     socket.on('error', console.error);
 
-    format.log("websocket", `Connecting to ${request.socket.remoteAddress}`);
-
     session_parser(request, {}, () => {
         if (!request.session.user_id) {
             socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
@@ -104,8 +106,6 @@ server.on('upgrade', function (request, socket, head) {
 });
 
 wss.on('connection', (ws, req) => {
-    format.log("websocket", `Connected to ${req.socket.remoteAddress} successfully!`);
-
     req.session.last_time = Date.now();
 
     ws.on('message', async (data, isBinary) => {

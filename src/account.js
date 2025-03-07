@@ -66,13 +66,12 @@ function create_account(req, res) {
     if (!new_user)
         return res.send({"error": new_user});
 
-    format.log("account", `Account @${new_user.username} [ID: ${new_user.id}] created successfully.`);
-
     // Get new id and log in
     const id = database.check_username(data.username);
     req.session.user_id = id;
 
-    format.log("account", `User @${new_user.username} [ID: ${new_user.id}] logged in successfully.`);
+    format.log("account", `Account @${data.username} [ID: ${id}] created successfully.`);
+    format.log("account", `User @${data.username} [ID: ${id}] logged in successfully.`);
 
     // Send to app
     return res.redirect("/app");
