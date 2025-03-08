@@ -7,7 +7,11 @@
     --segment-padding: 0.3rem;
 
     --message-padding-left: 3.65rem;
-    --message-view-width: calc(100% - var(--sidebar-width));
+    --message-view-width: calc(100vw - var(--sidebar-width));
+
+    --message-media-padding-right: 1rem;
+    --message-media-width-max: calc(var(--message-view-width) - var(--message-padding-left) - var(--segment-padding) * 2 - var(--message-media-padding-right));
+    --message-media-width: min(32rem, var(--message-media-width-max));
 
     --user-box-height: 4rem;
     --user-box-img-size: calc(var(--user-box-height) - var(--segment-padding) * 2);

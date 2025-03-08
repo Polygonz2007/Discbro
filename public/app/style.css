@@ -161,7 +161,7 @@ img.pfp {
 }
 
 img {
-    max-width: 32em;
+    max-width: var(--message-media-width);
     max-height: 20em;
 
     border-radius: 0.25rem;
