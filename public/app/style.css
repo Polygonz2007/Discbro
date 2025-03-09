@@ -13,6 +13,7 @@ body {
     background-color: var(--back-color);
 
     overscroll-behavior: none;
+    overflow-x: hidden;
 
     margin-bottom: calc(var(--message-box-height) + var(--segment-padding));
     margin-left: calc(var(--sidebar-width) + var(--segment-padding));
@@ -112,12 +113,28 @@ span {
     padding-left: var(--message-padding-left);
 }
 
-#message-box {
+#message-bar {
+    display: flex;
     position: fixed;
+
     width: calc(100vw - var(--sidebar-width));
     height: var(--message-box-height);
-
     bottom: 0; left: var(--sidebar-width);
+
+    background-color: var(--top-color);
+    padding-right: var(--scrollbar-padding);
+    box-sizing: border-box;
+}
+
+#message-bar > * {
+    display: flex;
+    height: var(--message-box-height);
+    flex-grow: 0;
+    flex-basis: var(--message-box-height);
+}
+
+#message-box {
+    flex-grow: 1;
 
     background-color: var(--top-color);
     outline: none;
@@ -220,7 +237,11 @@ input[type=checkbox] {
 
 /* Interactive stuff */
 .img-btn { /* On hover, shows alt text above and lets you click it and stuff */
-    width: 0;
+    width: var(--icon-size);
+    height: var(--icon-size);
+
+    margin: auto 0;
+    cursor: pointer;
 }
 
 

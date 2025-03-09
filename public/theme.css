@@ -5,21 +5,23 @@
     --sidebar-width: 24rem;
     --message-box-height: 3rem;
     --segment-padding: 0.3rem;
+    --scrollbar-padding: 1rem;
 
     --message-padding-left: 3.65rem;
     --message-view-width: calc(100vw - var(--sidebar-width));
 
-    --message-media-padding-right: 1rem;
-    --message-media-width-max: calc(var(--message-view-width) - var(--message-padding-left) - var(--segment-padding) * 2 - var(--message-media-padding-right));
+    --message-media-width-max: calc(var(--message-view-width) - var(--message-padding-left) - var(--segment-padding) * 2 - var(--scrollbar-padding));
     --message-media-width: min(32rem, var(--message-media-width-max));
 
     --user-box-height: 4rem;
     --user-box-img-size: calc(var(--user-box-height) - var(--segment-padding) * 2);
 
+    --icon-size: 2rem;
+
     /* Text */
     --text-font: "Consolas";
-    --text-size: 1rem;
     --text-size-small: 0.8rem;
+    --text-size: 1rem;
     --text-size-big: 1.5rem;
 
     --text-title-size: 3rem;

@@ -1,7 +1,7 @@
 
 ///  CONFIG  ///
 const config = {
-    port: { websocket: 2337, app: 80 }, // used for both websocket and app
+    port: 80, // used for both websocket and app
     rate_limit: 100, // minimum time (ms) between each request per user 
     database_path: "./src/discbro.db"
 }
@@ -60,11 +60,11 @@ app.use(session_parser);
 app.all("/app/*", account.check_login); // Make sure no gets or posts happen without being logged in
 
 // Get
-app.get("/app/user/:user_id", page.profile); 
+app.get("/app/user/:username", page.profile); 
 //app.get("/app", page.app);
 
 app.get("/api/get-theme", (req, res) => {
-    res.send(JSON.stringify({"theme": "midnight"}));
+    res.send(JSON.stringify({"theme": "dark"}));
 })
 
 // Post
@@ -148,8 +148,8 @@ app.use("*", (req, res) => {
 
 // Start server
 app.use(express.static(global.public_path));
-server.listen(config.port.app, () => {
-    format.log("server", `Server running on 127.0.0.1:${config.port.app}.`);
+server.listen(config.port, () => {
+    format.log("server", `Server running on 127.0.0.1:${config.port}.`);
 });
 
 

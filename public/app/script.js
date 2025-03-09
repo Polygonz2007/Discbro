@@ -31,17 +31,22 @@ console.log(`Connecting on ${url}...`);
 
 // Sending messages
 let message_box = doc.querySelector("#message-box");
+let message_button = doc.querySelector("#message-button");
 let messages = doc.querySelector("body");
 
 socket.addEventListener("open", (event) => {
 	// Connected, set up event listener
 	message_box.addEventListener("keydown", (e) => {
-		if (e.key == 'Enter') {
-		  sendMessage();
+	if (e.key == 'Enter') {
+			send_message();
 		}
-	  });
+	});
 
-	  get_chunk(true); // after, because there are none yet, and we want latest messages
+	message_button.addEventListener("click", () => {
+		send_message();
+	})
+
+	get_chunk(true); // after, because there are none yet, and we want latest messages
 
 	return;
 });
@@ -49,7 +54,6 @@ socket.addEventListener("open", (event) => {
 socket.addEventListener("message", (event) => {
 	// Parse, get, and check data
 	const data = JSON.parse(event.data);
-	console.log(data)
 	const dir = data.dir; // false: older, true: newer
 	let messages = data.messages;
 	if (messages.length == 0) {
@@ -176,7 +180,7 @@ socket.addEventListener("close", (event) => {
 	return;
 });
 
-function sendMessage() {
+function send_message() {
 	console.log("Posting message.");
 
 	// Get data
@@ -327,7 +331,7 @@ function write_messages(chunk, id, prev) {
 		} else {
 			chunk.innerHTML  += 
 			`<div class="message ${highlight}" id="M${current.id}" >
-				<a href="/app/user/${current.author.id}"><img src="/data/profile-pictures/default.png" class="pfp"></img></a>
+				<a href="/app/user/${current.author.username}"><img src="/data/profile-pictures/default.png" class="pfp"></img></a>
 				<div>
 					<a class="author" href="/app/user/${current.author.id}">${current.author.display_name} [@${current.author.username}]</a>
 					<p class="timestamp">${current.time_date}</p>
@@ -343,8 +347,6 @@ function write_messages(chunk, id, prev) {
 }
 
 window.addEventListener("scroll", (e) => {
-	console.log(e);
-
 	// get and store previous size of window
 	// and scroll
 	// if you were at bottom but no longer, scroll down

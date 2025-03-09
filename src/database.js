@@ -68,6 +68,9 @@ function check_username(username) {
 }
 
 function get_user_info(id) {
+    if (id == 0)
+        return false;
+
     // Check if another user already has username
     const user_query = db.prepare("SELECT * FROM users WHERE id = ?");
     let user = user_query.all(id);
