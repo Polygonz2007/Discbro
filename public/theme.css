@@ -49,6 +49,12 @@
     --status-5-col: #5AA; /* Do Disturb (active) */
 }
 
+:root[theme=dark-contrast] {
+    --back-color: #012;
+    --middle-color: #123;
+    --top-color: #356;
+}
+
 :root[theme=midnight] {
     --back-color: #000; /* 123 */
     --middle-color: #111; /* 234 */

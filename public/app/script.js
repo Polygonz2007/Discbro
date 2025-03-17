@@ -47,6 +47,7 @@ socket.addEventListener("open", (event) => {
 	})
 
 	get_chunk(true); // after, because there are none yet, and we want latest messages
+	socket.send(JSON.stringify({"type": "get_channels"}));
 
 	return;
 });
@@ -54,6 +55,14 @@ socket.addEventListener("open", (event) => {
 socket.addEventListener("message", (event) => {
 	// Parse, get, and check data
 	const data = JSON.parse(event.data);
+	console.log(data);
+
+	switch (data.type) {
+		case "channels":
+			display_channels(data.channels);
+			break;
+	}
+
 	const dir = data.dir; // false: older, true: newer
 	let messages = data.messages;
 	if (messages.length == 0) {
@@ -466,4 +475,17 @@ function format_datetime(messages) {
 	}
 
 	return messages;
+}
+
+const channel_list = doc.querySelector("#channels");
+
+function display_channels(channels) {
+	channel_list.innerHTML = "";
+
+	for (let i = 0; i < channels.length; i++) {
+		const channel = channels[i];
+		channel_list.innerHTML += `<li>#${channel.name} [ID ${channel.id}]</li>`;
+	}
+
+	return true;
 }

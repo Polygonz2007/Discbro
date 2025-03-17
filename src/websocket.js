@@ -13,7 +13,6 @@ function send_message(data, req) {
 
     // Sanetize
     //data.content = format.escape_html(data.content);
-    data.content = format.links(data.content);
 
     // Store in database
     const message_id = database.new_message(data.channel_id, data.author_id, data.content);
@@ -47,16 +46,27 @@ function get_chunk(data, req, ws) {
 
 function get_channels(data, req, ws) {
     const channels = database.get_channels();
+    
+    ws.send(JSON.stringify({
+        "type": "channels",
+        "channels": channels
+    }));
 }
 
 function get_channel(data, req, ws) {
+    const channel = database.get_channels();
 
+    ws.send(JSON.stringify({
+        "type": "channel",
+        "id": channel.id,
+        "name": channel.name
+    }));
 }
 
 module.exports = {
     send_message,
-
     get_chunk,
+
     get_channels,
     get_channel
 }

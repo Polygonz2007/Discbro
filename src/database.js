@@ -2,6 +2,7 @@
 // This module is responsible for handling database interaction by the app, in a safe and proper way.
 
 const fs = require("fs");
+const format = require("./format.js");
 
 const sqlite3 = require('better-sqlite3');
 const db = sqlite3('./src/discbro.db');
@@ -160,6 +161,9 @@ function format_messages(messages, user_id) {
         const search_str = " " + message.content + " ";
         if ((user && search_str.indexOf(` @${user.username} `) != -1) || search_str.indexOf(` @everyone `) != -1)
             message.highlight = true;
+
+        // Add embeds and such
+        message.content = format.embeds(message.content);
 
         // Clean up data for transmission
         delete message.author_id; // already in author

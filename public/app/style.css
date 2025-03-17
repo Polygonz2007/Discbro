@@ -177,7 +177,7 @@ img.pfp {
     vertical-align: top;
 }
 
-img {
+img, video {
     max-width: var(--message-media-width);
     max-height: 20em;
 
