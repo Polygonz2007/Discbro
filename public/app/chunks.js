@@ -1,0 +1,1 @@
+// Responsible for handling incoming messages from the server and displaying them.

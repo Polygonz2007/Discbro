@@ -37,12 +37,13 @@
                 <p id="status">Online</p>
             </div>
 
-            <a><img src="/graphics/icon/profile.svg" class="icon img-btn"></a>
-            <a><img src="/graphics/icon/settings.svg" class="icon img-btn"></a>
+            <a href="/app/user/1"><img src="/graphics/icon/profile.svg" class="icon img-btn"></a>
+            <a href="/app/settings"><img src="/graphics/icon/settings.svg" class="icon img-btn"></a>
         </div>
     </div>
 
-    <h1>The beginning of <i>Channel 1</i></h1><br><h3>This channel was created 07.03.2025 and has 17 messages in total.</h3>
+    <h1>The beginning of <i id="channel-name">Channel 1</i></h1><br>
+    <h3>This channel was created on <span id="channel-created-date">[unknown]</span>.</h3>
 
     <div id="message-bar">
         <input type="text" id="message-box" placeholder="Write your message here..." />
@@ -51,6 +52,13 @@
     
 
     <!-- Scripts -->
+    <script> // Variables used by all scripts
+        // References to main elements
+        const doc = document;
+        const body = doc.body;
+        const root = doc.querySelector(":root");
+    </script>
+
     <script src="./script.js"></script>
 </body>
 

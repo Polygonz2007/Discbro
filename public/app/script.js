@@ -1,15 +1,15 @@
 
-const port = 2337; // port used for WebSocket
 const url = `ws://${window.location.host}`;
-
-const doc = document;
-const root = doc.querySelector(":root");
-const body = doc.body;
 const socket = new WebSocket(url);
+
+let channels = {};
 
 let app = {
 	debug: false,
-	channel_id: 1,
+	channel: {
+		id: 1,
+		created_date: 0
+	},
 
 	max_chunks: 8, // Max number of chunks that can be loaded at once, configurable by user
 	chunk_s: 32, // size of each chunk
@@ -46,7 +46,6 @@ socket.addEventListener("open", (event) => {
 		send_message();
 	})
 
-	get_chunk(true); // after, because there are none yet, and we want latest messages
 	socket.send(JSON.stringify({"type": "get_channels"}));
 
 	return;
@@ -59,7 +58,13 @@ socket.addEventListener("message", (event) => {
 
 	switch (data.type) {
 		case "channels":
-			display_channels(data.channels);
+			for (let i = 0; i < data.channels.length; i++) {
+				channels[data.channels[i].id] = data.channels[i];
+			}
+
+			display_channels(channels);
+			open_channel(data.channels[0].id); //open first channel 
+
 			break;
 	}
 
@@ -76,7 +81,7 @@ socket.addEventListener("message", (event) => {
 	}
 
 	// We only care about current channel
-	if (data.channel_id != app.channel_id)
+	if (data.channel_id != app.channel.id)
 		return;
 
 	if (data.up_to_date)
@@ -199,7 +204,7 @@ function send_message() {
 		return; // cant send empty message
 
 	// Send
-	const data = { "type": "send_message", "channel_id": app.channel_id, "content": content };
+	const data = { "type": "send_message", "channel_id": app.channel.id, "content": content };
 	const send = JSON.stringify(data);
 
 	socket.send(send);
@@ -222,7 +227,7 @@ function get_chunk(dir = false) {
 	if (chunk) // but if we already have a chunk we find based off that
 		message_id = dir ? chunk.newest_id : chunk.oldest_id;
 
-	let data = { "type": "get_chunk", "channel_id": app.channel_id, "dir": dir, "last_id": message_id, "chunk_s": app.chunk_s };
+	let data = { "type": "get_chunk", "channel_id": app.channel.id, "dir": dir, "last_id": message_id, "chunk_s": app.chunk_s };
 	data = JSON.stringify(data);
 
 	socket.send(data);
@@ -321,7 +326,7 @@ function write_messages(chunk, id, prev) {
 		}
 
 		if (!same_day || !prev)
-			chunk.innerHTML += `<span>${current_time.toLocaleDateString('en-GB', {month: 'long', day: 'numeric', year: 'numeric'})}</span>`;
+			chunk.innerHTML += `<span class="divider">${current_time.toLocaleDateString('en-GB', {month: 'long', day: 'numeric', year: 'numeric'})}</span>`;
 
 		// Get extra format data
 		const highlight = (current.highlight) ? "highlight" : "";
@@ -482,10 +487,52 @@ const channel_list = doc.querySelector("#channels");
 function display_channels(channels) {
 	channel_list.innerHTML = "";
 
-	for (let i = 0; i < channels.length; i++) {
-		const channel = channels[i];
-		channel_list.innerHTML += `<li>#${channel.name} [ID ${channel.id}]</li>`;
+	const keys = Object.keys(channels);
+	for (let i = 0; i < keys.length; i++) {
+		const channel = channels[keys[i]];
+		channel_list.innerHTML += `<li><a id="channel_${channel.id}" onclick="open_channel(${channel.id});">#${channel.name}</a></li>`;
 	}
 
 	return true;
+}
+
+
+function open_channel(channel_id) {
+	// Remove previous highlihgth
+	doc.querySelector(`#channel_${app.channel.id}`).classList.remove("active");
+
+	// Update data
+	app.channel.id = channel_id;
+
+	app.up_to_date = false;
+	app.at_first = false;
+	app.newest_chunk = 0;
+	app.oldest_chunk = 0;
+	app.chunk_index = 0;
+
+	app.chunks = [];
+
+	// Remove previous channel
+	const chunks = doc.querySelectorAll(".chunk");
+	for (let chunk = 0; chunk < chunks.length; chunk++) {
+		console.log(chunk);
+		chunks[chunk].remove();
+	}
+
+	// Set info
+	const options = {
+		weekday: "long",
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	  };
+
+	const create_date = new Date(channels[app.channel.id].created_time * 1000);
+	doc.querySelector("#channel-created-date").innerHTML = create_date.toLocaleDateString("en-GB", options);
+
+	doc.querySelector("#channel-name").innerHTML = `#${channels[channel_id].name}`;
+
+	doc.querySelector(`#channel_${channel_id}`).classList.add("active");
+
+	get_chunk(true); // after, because there are none yet, and we want latest messages
 }

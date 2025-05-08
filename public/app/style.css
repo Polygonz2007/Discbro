@@ -8,7 +8,7 @@
 /** Styles **/
 body {
     font-family: var(--text-font);
-    font-size: var(--text-size);
+    font-size: var(--text-size-default);
     color: var(--text-color);
     background-color: var(--back-color);
 
@@ -26,8 +26,8 @@ input {
     color: var(--text-color);
 
     box-sizing: border-box;
-    padding: 0 var(--text-size);
-    height: calc(var(--text-size) + 1rem);
+    padding: 0 var(--text-size-default);
+    height: calc(var(--text-size-default) + 1rem);
 
     border: none;
     border-radius: 0;
@@ -78,7 +78,12 @@ p.detached {
     max-width: calc(100% - 3.3em);
 }
 
-.message:hover {
+div.message:hover {
+    background-color: var(--top-color);
+    padding-left: 0.7rem;
+}
+
+div.detached:hover {
     background-color: var(--top-color);
     padding-left: 0.3rem;
 }
@@ -96,7 +101,7 @@ p.detached {
     font-size: var(--text-size-small);
 }
 
-span {
+span.divider {
     display: inline-block;
     height: 1rem;
     width: calc(100% - var(--message-padding-left));
@@ -111,6 +116,7 @@ span {
     margin-bottom: 0;
 
     padding-left: var(--message-padding-left);
+    padding-bottom: 0.5rem;
 }
 
 #message-bar {
@@ -169,10 +175,9 @@ a:hover {
 img.pfp {
     height: 2.5rem;
     width: 2.5rem;
-    padding-top: 0.25em;
     aspect-ratio: 1;
-    border-radius: 0;
-    margin-top: 0;
+    border-radius: 0.2rem;
+    margin-top: 0.25em;
 
     vertical-align: top;
 }
@@ -221,7 +226,8 @@ input[type=checkbox] {
 
 
 #displayname {
-    font-size: var(--text-size);
+    font-size: var(--text-size-larger);
+    font-weight: bold;
 }
 
 #username {
@@ -242,6 +248,16 @@ input[type=checkbox] {
 
     margin: auto 0;
     cursor: pointer;
+}
+
+
+/* Channels */
+.active {
+    font-weight: bold;
+}
+
+li {
+    margin-bottom: 0.35rem;
 }
 
 

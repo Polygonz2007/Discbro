@@ -31,7 +31,7 @@ function new_user(username, display_name, password) {
     const hash = bcrypt.hashSync(password, salt_rounds);
 
     // Insert new user
-    const add_user = db.prepare("INSERT INTO users (username, display_name, password, profile_picture) VALUES (?, ?, ?, '/data/profile-sqpictures/default.png')");
+    const add_user = db.prepare("INSERT INTO users (username, display_name, password, profile_picture) VALUES (?, ?, ?, '/data/profile-pictures/default.png')");
     let user = add_user.run(username, display_name, hash);
 
     if (user.changes == 0)
@@ -194,7 +194,7 @@ function delete_user(username) {
 function get_channels(server_id, user_id) {
     // For now just returns all channels
     // But eventually, returns all channels in a server the user has access to
-    const query = db.prepare("SELECT id, name FROM channels");
+    const query = db.prepare("SELECT id, name, created_time FROM channels");
     const channels = query.all();
     if (channels.length == 0)
         return false;
@@ -203,12 +203,21 @@ function get_channels(server_id, user_id) {
 }
 
 function get_channel(id) {
-    const query = db.prepare("SELECT id, name, created_time FROM channels WHERE id = ?");
+    const query = db.prepare("SELECT id, name, category_id, created_time FROM channels WHERE id = ?");
     const channel = query.get(id);
     if (channel.length == 0)
         return false;
 
     return channel;
+}
+
+function get_channel_stats(id) {
+    const query = db.prepare("SELECT id, name, created_time, num_messages FROM channels INNER JOIN (SELECT channel_id, COUNT(*) as num_messages FROM messages) ON id = channel_id WHERE id = ?");
+    const stats = query.get(id);
+    if (stats.length == 0)
+        return false;
+
+    return stats;
 }
 
 module.exports = {
@@ -221,6 +230,7 @@ module.exports = {
 
     get_channel,
     get_channels,
+    get_channel_stats,
     
     new_message,
 

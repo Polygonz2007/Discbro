@@ -64,11 +64,11 @@ label {
 
 /* Highlight image buttons */
 a:has(.img-btn):hover {
-    filter: drop-shadow(var(--text-color) 0 0 var(--text-size-small));
+    filter: drop-shadow(var(--weak-text-color) 0 0 var(--text-size-small));
 }
 
 a:has(.img-btn):active {
-    filter: drop-shadow(var(--text-color) 0 0 var(--text-size-small)) drop-shadow(var(--weak-text-color) 0 0 var(--text-size));
+    filter: drop-shadow(var(--weak-text-color) 0 0 var(--text-size-small)) drop-shadow(var(--weak-text-color) 0 0 var(--text-size-default));
 }
 
 /* Light Mode Icons */

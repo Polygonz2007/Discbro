@@ -3,7 +3,7 @@
 :root { /* Default theme: dark */
     /* Dimensions */
     --sidebar-width: 24rem;
-    --message-box-height: 3rem;
+    --message-box-height: 3.5rem;
     --segment-padding: 0.3rem;
     --scrollbar-padding: 1rem;
 
@@ -13,16 +13,18 @@
     --message-media-width-max: calc(var(--message-view-width) - var(--message-padding-left) - var(--segment-padding) * 2 - var(--scrollbar-padding));
     --message-media-width: min(32rem, var(--message-media-width-max));
 
-    --user-box-height: 4rem;
+    --user-box-height: 4.5rem;
     --user-box-img-size: calc(var(--user-box-height) - var(--segment-padding) * 2);
 
-    --icon-size: 2rem;
+    --icon-size: 2.25rem;
 
     /* Text */
     --text-font: "Consolas";
+    
     --text-size-small: 0.8rem;
-    --text-size: 1rem;
-    --text-size-big: 1.5rem;
+    --text-size-default: 1rem;
+    --text-size-larger: 1.2rem;
+    --text-size-large: 1.5rem;
 
     --text-title-size: 3rem;
     --text-subtitle-size: 1.7rem;
@@ -52,7 +54,7 @@
 :root[theme=dark-contrast] {
     --back-color: #012;
     --middle-color: #123;
-    --top-color: #356;
+    --top-color: #234;
 }
 
 :root[theme=midnight] {
