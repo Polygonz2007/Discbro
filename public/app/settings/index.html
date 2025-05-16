@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discbro Settings</title>
+
+    <!-- CSS for all pages -->
+    <link rel="stylesheet" href="/theme.css" />
+    <link rel="stylesheet" href="/global.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+    <h1>Settings</h1>
+
+    <div>
+        <h2>Account</h2>
+        <label>Username</label>
+        <input type="text" placeholder="Username"> <br>
+        
+        <label>Display name</label>
+        <input type="text" placeholder="Displayname"> <br>
+
+        <input type="submit" value="Save"> <br>
+
+        <br> <br> <br>
+        <label>Manage account</label> <br>
+        <input type="button" value="Delete account">
+
+        <h2>Data</h2>
+        <input type="button" value="Update cookie consent" onclick="open_popup();">
+    </div>
+    
+    <!-- Cookies -->
+    <div id="cookies">
+        <div id="cookies-selector">
+            <h2>Consent for Cookies</h2>
+            <p>Select which cookies you consent to us using. You can change these later in settings.</p>
+            <br>
+
+            <label><input type="checkbox" value="Necessary" id="check-necessary" checked disabled > Necessary </label> <br>
+            <label><input type="checkbox" value="Analytics" id="check-analytics"> Analytics </label> <br>
+            <label><input type="checkbox" value="Marketing" id="check-marketing"> Marketing (3918 partners and counting!) </label> <br>
+            <br>
+
+            <br> <p>Necessary cookies are required for the site to function.</p>
+            <br> <p>Analytical cookies are used to track how long you spend on the site, and which menus you use.</p>
+            <br> <p>Marketing cookies are used to get us more 🤑🫰💵💶💷💸💰🪙💴🤑🤑</p>
+            <br> <br>
+
+            <div id="cookies-buttons">
+                <input type="button" value="Decline all" id="cookies-decline-all">
+                <input type="button" value="Save current" id="cookies-save">
+                <input type="button" value="Accept all" id="cookies-accept-all">
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script> // Variables used by all scripts
+        // References to main elements
+        const doc = document;
+        const body = doc.body;
+        const root = doc.querySelector(":root");
+    </script>
+
+    <script src="../cookies.js"></script>
+</body>
+</html>

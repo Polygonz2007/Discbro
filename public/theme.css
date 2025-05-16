@@ -86,24 +86,53 @@
 /** Font **/
 @font-face {
     font-family: "Consolas";
-    src: url("./graphics/font/CONSOLA.TTF");
+    src: url("./graphics/font/consolas/CONSOLA.TTF");
 }
 
 @font-face {
     font-family: "Consolas";
-    src: url("./graphics/font/CONSOLAB.TTF");
+    src: url("./graphics/font/consolas/CONSOLAB.TTF");
     font-weight: bold;
 }
 
 @font-face {
     font-family: "Consolas";
-    src: url("./graphics/font/CONSOLAI.TTF");
+    src: url("./graphics/font/consolas/CONSOLAI.TTF");
     font-style: italic;
 }
 
 @font-face {
     font-family: "Consolas";
-    src: url("./graphics/font/CONSOLAZ.TTF");
+    src: url("./graphics/font/consolas/CONSOLAZ.TTF");
+    font-weight: bold;
+    font-style: italic;
+}
+
+
+
+
+
+
+@font-face {
+    font-family: "Nebula Sans";
+    src: url("./graphics/font/nebula-sans/NebulaSans-Book.otf");
+}
+
+@font-face {
+    font-family: "Nebula Sans";
+    src: url("./graphics/font/nebula-sans/NebulaSans-Bold.otf");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "Nebula Sans";
+    src: url("./graphics/font/nebula-sans/NebulaSans-BookItalic.otf");
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Nebula Sans";
+    src: url("./graphics/font/nebula-sans/NebulaSans-BoldItalic.otf");
     font-weight: bold;
     font-style: italic;
 }

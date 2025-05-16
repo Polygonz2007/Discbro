@@ -26,7 +26,7 @@ form > * {
 
 label {
     font-size: var(--text-size-small);
-    margin-top: var(--text-size-big);
+    margin-top: var(--text-size-large);
 }
 
 input {

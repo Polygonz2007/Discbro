@@ -1,0 +1,9 @@
+/* CSS intended for use where there is a lot of text */
+
+body {
+    margin: 6rem calc(50% - 32rem);
+}
+
+li {
+    padding: 0.1rem 0;
+}

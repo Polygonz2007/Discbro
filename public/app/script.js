@@ -10,6 +10,9 @@ let app = {
 		id: 1,
 		created_date: 0
 	},
+	server: {
+		id: 1
+	},
 
 	max_chunks: 8, // Max number of chunks that can be loaded at once, configurable by user
 	chunk_s: 32, // size of each chunk
@@ -46,7 +49,7 @@ socket.addEventListener("open", (event) => {
 		send_message();
 	})
 
-	socket.send(JSON.stringify({"type": "get_channels"}));
+	socket.send(JSON.stringify({"type": "get_channels", "server_id": app.server.id}));
 
 	return;
 });
@@ -204,7 +207,7 @@ function send_message() {
 		return; // cant send empty message
 
 	// Send
-	const data = { "type": "send_message", "channel_id": app.channel.id, "content": content };
+	const data = { "type": "add_message", "channel_id": app.channel.id, "content": content };
 	const send = JSON.stringify(data);
 
 	socket.send(send);
@@ -227,7 +230,7 @@ function get_chunk(dir = false) {
 	if (chunk) // but if we already have a chunk we find based off that
 		message_id = dir ? chunk.newest_id : chunk.oldest_id;
 
-	let data = { "type": "get_chunk", "channel_id": app.channel.id, "dir": dir, "last_id": message_id, "chunk_s": app.chunk_s };
+	let data = { "type": "get_messages", "channel_id": app.channel.id, "dir": dir, "last_id": message_id, "chunk_s": app.chunk_s };
 	data = JSON.stringify(data);
 
 	socket.send(data);
@@ -345,7 +348,7 @@ function write_messages(chunk, id, prev) {
 		} else {
 			chunk.innerHTML  += 
 			`<div class="message ${highlight}" id="M${current.id}" >
-				<a href="/app/user/${current.author.username}"><img src="/data/profile-pictures/default.png" class="pfp"></img></a>
+				<a href="/app/user/${current.author.username}"><img src="/data/profile-pictures/${current.author.id}.png" class="pfp"></img></a>
 				<div>
 					<a class="author" href="/app/user/${current.author.id}">${current.author.display_name} [@${current.author.username}]</a>
 					<p class="timestamp">${current.time_date}</p>
@@ -484,8 +487,8 @@ function format_datetime(messages) {
 
 const channel_list = doc.querySelector("#channels");
 
-function display_channels(channels) {
-	channel_list.innerHTML = "";
+function display_channels(channels, server) {
+	channel_list.innerHTML = `<h4>Channels in <i>${server}</i></h4>`;
 
 	const keys = Object.keys(channels);
 	for (let i = 0; i < keys.length; i++) {

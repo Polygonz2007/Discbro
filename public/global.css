@@ -42,7 +42,11 @@ input {
     padding: none;
 }
 
-input:focus {
+input[type=text]:focus {
+    background-color: var(--selected-color);
+}
+
+input:active {
     background-color: var(--selected-color);
 }
 

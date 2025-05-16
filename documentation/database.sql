@@ -71,5 +71,10 @@ create table messages (
 );
 
 -- Init
-insert into servers (name) values ('Global');
-insert into channels (name, server_id) values ('channel 1', 1);
+insert into servers (name) values ('Main');
+insert into channels (name, server_id) values ('general', 1);
+insert into channels (name, server_id) values ('quotes', 1);
+
+insert into servers (name) values ('Second Server');
+insert into channels (name, server_id) values ('general', 2);
+insert into channels (name, server_id) values ('second-server-is-better', 2);

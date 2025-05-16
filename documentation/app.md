@@ -21,6 +21,17 @@ If the function ran successfully, 0 is returned. If not, it returns a string wit
 The thinking behind this is that if an error occured, it should be forwarded to the user who can then decide if they want to try again or just, give up, idk.
 If it is an error which should be handled by the server, however, I might choose to return false. If the function can fail in multiple ways i might return a negative number, liker in C, which identifies which error occured.
 
+## Terms in code functions
+get: get data, either from server or cache, for use
+add: add data to cache / database
+update: update data stored in a cache / database
+delete: delete data stored in a cache / database
+
+create: make a new HTML element with info supplied
+change: update a HTML element, either the info or the entire structure
+remove: remove a HTML element
+
+Any of these terms used as "__ed" instead (for example "added" and not "add") is used to update information. For example, if a channel is added to a server, the request the server sends to clients is "channel_added". This means the client should update it's cache, and if necessary update the UI.
 
 ## Message loading
 Messages are loaded in chunks of 32 messages each. Maybe 48? Anyways,

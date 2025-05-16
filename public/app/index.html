@@ -22,11 +22,14 @@
 <body>
     <!-- Page -->
     <div id="sidebar">
-        <h2>Channels</h2>
+        <div id="servers">
+            <img src="/data/server-icons/1.png">
+            <img src="/data/server-icons/2.png">
+        </div>
 
-        <ul id="channels">
-            <p>channel 1</p>
-        </ul>
+        <div id="channels">
+            <h2>Server 1</h2>
+        </div>
 
         <div id="user">
             <img src="/data/profile-pictures/default.png" />
@@ -49,6 +52,32 @@
         <input type="text" id="message-box" placeholder="Write your message here..." />
         <a><img src="/graphics/icon/send.svg" class="icon img-btn" id="message-button" ></a>
     </div>
+
+
+    <!-- Cookies -->
+    <div id="cookies">
+        <div id="cookies-selector">
+            <h2>Consent for Cookies</h2>
+            <p>Select which cookies you consent to us using. You can change these later in settings.</p>
+            <br>
+
+            <label><input type="checkbox" value="Necessary" id="check-necessary" checked disabled > Necessary </label> <br>
+            <label><input type="checkbox" value="Analytics" id="check-analytics"> Analytics </label> <br>
+            <label><input type="checkbox" value="Marketing" id="check-marketing"> Marketing (3918 partners and counting!) </label> <br>
+            <br>
+
+            <br> <p>Necessary cookies are required for the site to function.</p>
+            <br> <p>Analytical cookies are used to track how long you spend on the site, and which menus you use.</p>
+            <br> <p>Marketing cookies are used to get us more 🤑🫰💵💶💷💸💰🪙💴🤑🤑</p>
+            <br> <br>
+
+            <div id="cookies-buttons">
+                <input type="button" value="Decline all" id="cookies-decline-all">
+                <input type="button" value="Save current" id="cookies-save">
+                <input type="button" value="Accept all" id="cookies-accept-all">
+            </div>
+        </div>
+    </div>
     
 
     <!-- Scripts -->
@@ -59,7 +88,9 @@
         const root = doc.querySelector(":root");
     </script>
 
-    <script src="./script.js"></script>
+    <script src="./cookies.js"></script>
+    <script src="./comms.js"></script>
+    <!--<script src="./script.js"></script>-->
 </body>
 
 </html>

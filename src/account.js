@@ -61,8 +61,12 @@ function create_account(req, res) {
     if (data.password != data.confirm)
         return res.send({"error": "Passwords do not match. Please make sure they are typed correctly."});
 
+    // Check email (does nothin rn)
+    if (!data.email || data.email == "")
+        data.email = null;
+
     // Create user (default displayname is same as username)
-    const new_user = database.new_user(data.username, data.username, data.password);
+    const new_user = database.new_user(data.username, data.username, data.password, data.email);
     if (!new_user)
         return res.send({"error": new_user});
 

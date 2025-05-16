@@ -25,7 +25,8 @@ async function login(event) {
     const payload = {
         username: form.username.value,
         password: form.password.value,
-        confirm: form.confirm.value
+        confirm: form.confirm.value,
+        email: form.email.value
     };
 
     // Make request

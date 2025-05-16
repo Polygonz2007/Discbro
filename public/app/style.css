@@ -252,12 +252,38 @@ input[type=checkbox] {
 
 
 /* Channels */
+#channels {
+    position: fixed;
+    top: 0;
+    left: 6rem;
+}
+
 .active {
     font-weight: bold;
 }
 
 li {
     margin-bottom: 0.35rem;
+    margin-left: 1.5rem;
+}
+
+/* Servers */
+#servers {
+    position: fixed;
+    top: 0rem;
+    left: 0rem;
+
+    padding: 0.5rem;
+
+    width: 4rem;
+    height: 100%;
+    background-color: var(--top-color);
+}
+
+#servers > img {
+    width: 4rem;
+    height: 4rem;
+    object-fit: cover;
 }
 
 
@@ -270,4 +296,34 @@ li {
     #sidebar {
         display: none;
     }
+}
+
+
+
+
+
+
+/* Cookies */
+#cookies {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-color: #0008;
+}
+
+#cookies-selector {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 28rem;
+    background-color: var(--back-color);
+    border: solid #FFF2 0.2rem;
+    padding: 3rem;
+}
+
+#cookies-buttons {
+    display: flex;
+    justify-content: space-around;
 }

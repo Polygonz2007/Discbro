@@ -26,17 +26,20 @@ function setup() {
 }
 
 // Adds a user to the database, with checks if it is a valid name and stuff
-function new_user(username, display_name, password) {
+function new_user(username, display_name, password, email) {
     // Hash password
     const hash = bcrypt.hashSync(password, salt_rounds);
 
     // Insert new user
-    const add_user = db.prepare("INSERT INTO users (username, display_name, password, profile_picture) VALUES (?, ?, ?, '/data/profile-pictures/default.png')");
-    let user = add_user.run(username, display_name, hash);
+    const add_user = db.prepare("INSERT INTO users (username, display_name, password, profile_picture, email) VALUES (?, ?, ?, '/data/profile-pictures/default.png', ?)");
+    let user = add_user.run(username, display_name, hash, email);
 
     if (user.changes == 0)
         return "Database error. Please try again.";
 
+    // Send account created notif to email, so they can verify the email
+    // ---
+    
     return true;
 }
 
@@ -44,7 +47,7 @@ function new_group() {
     return 0;
 }
 
-function new_message(channel_id, author_id, content) {
+function add_message(channel_id, author_id, content) {
     if (content.length > 2048)
         return false;
 
@@ -56,6 +59,26 @@ function new_message(channel_id, author_id, content) {
 
     return result.lastInsertRowid;
 }
+
+function update_message() {
+    return 0;
+}
+
+function delete_message(message_id) {
+    const query = db.prepare("DELETE FROM messages WHERE id = ?");
+    let result = query.run(message_id);
+
+    if (result.changes == 0)
+        return false;
+
+    console.log("it twas deleted")
+
+    return true;
+}
+
+
+
+
 
 function check_username(username) {
     // If a user is found returns the users id, if not returns -1
@@ -131,18 +154,19 @@ function get_message(message_id) {
     let result = query.all(message_id);
 
     if (result.length != 0)
-        return result;
+        return result[0];
 
     return false;
 }
 
-function format_messages(messages, user_id) {
+function format_messages(messages, user_id) { // just do this on the client bro wtf
     if (!messages)
         return false;
 
     let buffer = {};
     const user = get_user_info(user_id);
 
+    console.log(messages)
     messages.forEach((message) => {
         const author_id = message.author_id;
 
@@ -194,10 +218,12 @@ function delete_user(username) {
 function get_channels(server_id, user_id) {
     // For now just returns all channels
     // But eventually, returns all channels in a server the user has access to
-    const query = db.prepare("SELECT id, name, created_time FROM channels");
-    const channels = query.all();
+    const query = db.prepare("SELECT id, name, created_time FROM channels WHERE server_id = ?");
+    const channels = query.all(server_id);
     if (channels.length == 0)
         return false;
+
+    // Clean up data
 
     return channels;
 }
@@ -220,6 +246,20 @@ function get_channel_stats(id) {
     return stats;
 }
 
+
+/// SERVERS ///
+function get_user_servers(user_id) {
+    const query = db.prepare(`
+        SELECT server_id AS id, name, icon
+        FROM servers, members
+        WHERE members.user_id = ? AND servers.id = members.server_id`);
+    const servers = query.all(user_id);
+    if (servers.length == 0)
+        return false;
+
+    return servers;
+}
+
 module.exports = {
     setup,
 
@@ -232,10 +272,15 @@ module.exports = {
     get_channels,
     get_channel_stats,
     
-    new_message,
+    add_message,
+    update_message,
+    delete_message,
 
     get_message,
     get_messages,
     get_message_chunk,
-    format_messages
+    format_messages,
+
+    // Server
+    get_user_servers
 }

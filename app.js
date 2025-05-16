@@ -6,6 +6,20 @@ const config = {
     database_path: "./src/discbro.db"
 }
 
+const stats = {
+    gets: 0,
+    prev_gets: 0,
+    posts: 0,
+    prev_posts: 0,
+    
+    open_sockets: 0,
+    prev_open_sockets: 0,
+    socket_reqs: 0,
+    prev_socket_reqs: 0,
+
+    update_rate: 120 //seconds
+}
+
 ///  Prerequisites and tests  ///
 require('dotenv').config()
 const fs = require("fs");
@@ -59,6 +73,7 @@ app.use(session_parser);
 
 app.all("/app/*", account.check_login); // Make sure no gets or posts happen without being logged in
 
+
 // Get
 app.get("/app/user/:username", page.profile); 
 //app.get("/app", page.app);
@@ -67,9 +82,16 @@ app.get("/api/get-theme", (req, res) => {
     res.send(JSON.stringify({"theme": "dark"}));
 })
 
+
 // Post
 app.post("/login", account.login); // Allow users to log in, check if the credentials are correct and if they are update session
 app.post("/create-account", account.create_account);
+
+
+// Statistics
+app.get("*", (req, res, next) => { stats.gets++; return next(); });
+app.post("*", (req, res, next) => { stats.posts++; return next(); });
+
 
 global.public_path = path.join(__dirname, "public");
 
@@ -107,8 +129,12 @@ server.on('upgrade', function (request, socket, head) {
 
 wss.on('connection', (ws, req) => {
     req.session.last_time = Date.now();
+    stats.open_sockets++;
 
     ws.on('message', async (data, isBinary) => {
+        // Statistics
+        stats.socket_reqs++;
+
         // Translate
         data = isBinary ? data : data.toString();
         data = JSON.parse(data);
@@ -116,27 +142,74 @@ wss.on('connection', (ws, req) => {
         // Rate limit
         // Doesnt really work, but, good enough for now.
         // Make counter system instead (available requests vs. completed requests, +1 av. every someting)
-        const diff = Date.now() - req.session.last_time;
-        if (diff < config.rate_limit)
-            await delay(config.rate_limit - diff);
+        //const diff = Date.now() - req.session.last_time;
+        //if (diff < config.rate_limit)
+        //    await delay(config.rate_limit - diff);
+//
+        //req.session.last_time = Date.now();
 
-        req.session.last_time = Date.now();
+        // Get response and respond with it
+        let resp = process_ws_req(data, req, ws);
+        resp.req_id = data.req_id;
 
-        // Functions
-        const type = data.type;
-        switch (type) {
-            case "send_message": websocket.send_message(data, req, ws); return;
-
-            case "get_chunk": websocket.get_chunk(data, req, ws); return;
-            case "get_channels": websocket.get_channels(data, req, ws); return;
-            case "get_channel": websocket.get_channel(data, req, ws); return;
-        }
+        return ws.send(JSON.stringify(resp));
     });
 
     ws.on('close', () => {
         // Handle connection close
+        stats.open_sockets--;
     });
 });
+
+function process_ws_req(data, req, ws) {
+    if (!data.type)
+        return {};
+
+    switch (data.type) {
+        // Messages (happen most often, so first)
+        case "add_message": return websocket.add_message(data, req, ws);
+        case "update_message": return;
+        case "delete_message": return websocket.delete_message(data, req, ws);
+
+        case "get_messages": return websocket.get_messages(data, req, ws);
+
+        // Roles
+        case "add_role": return;
+        case "update_role": return;
+        case "delete_role": return;
+
+        case "get_roles": return;
+
+        // Channels
+        //case "add_channel": websocket.add_channel(data, req, ws); return;
+        //case "update_channel": websocket.update_channel(data, req, ws); return;
+        //case "delete_channel": websocket.delete_channel(data, req, ws); return;
+
+        case "get_channel": return websocket.get_channel(data, req, ws);
+        case "get_channels": return websocket.get_channels(data, req, ws);
+
+        // Server
+        case "add_server": return websocket.add_server(data, req, ws);
+        case "update_server": return websocket.update_server(data, req, ws);
+        case "delete_server": return websocket.delete_server(data, req, ws);
+
+        case "get_server": return websocket.get_server(data, req, ws);
+        case "get_servers": return websocket.get_servers(data, req, ws);
+
+        // Bad request? You get NOTHIN
+        default: return {};
+    }
+}
+
+
+
+
+
+
+
+
+
+
 
 // Not found page
 app.use("*", (req, res) => {
@@ -152,7 +225,40 @@ server.listen(config.port, () => {
     format.log("server", `Server running on 127.0.0.1:${config.port}.`);
 });
 
+setInterval(() => {
+    // Calcuilate styats
+    const sum = stats.gets + stats.posts + stats.socket_reqs;
+    const prev_sum = stats.prev_gets + stats.prev_posts + stats.prev_socket_reqs;
 
+    let change_gets = stats.gets - stats.prev_gets;
+    let change_posts = stats.posts - stats.prev_posts;
+    let change_ws = stats.socket_reqs - stats.prev_socket_reqs;
+    let change_sockets = stats.open_sockets - stats.prev_open_sockets;
+    let change_sum = sum - prev_sum;
+
+    if (change_gets >= 0) change_gets = "+" + change_gets;
+    if (change_posts >= 0) change_posts = "+" + change_posts;
+    if (change_ws >= 0) change_ws = "+" + change_ws;
+    if (change_sockets >= 0) change_sockets = "+" + change_sockets;
+    if (change_sum >= 0) change_sum = "+" + change_sum;
+
+    // Print stats
+    console.log(`
+Total requests
+    GETs:    ${stats.gets} [${change_gets}]
+    POSTs:   ${stats.posts} [${change_posts}]
+    WS:      ${stats.socket_reqs} [${change_ws}]
+    Sockets: ${stats.open_sockets} [${change_sockets}]
+
+    Sum:     ${sum} [${change_sum}]
+    `);
+
+    // Update prev
+    stats.prev_gets = stats.gets;
+    stats.prev_posts = stats.posts;
+    stats.prev_socket_reqs = stats.socket_reqs;
+    stats.prev_open_sockets = stats.open_sockets;
+}, stats.update_rate * 1000) // every rate seconds
 
 // move to different file
 const delay = ms => new Promise(res => setTimeout(res, ms));
