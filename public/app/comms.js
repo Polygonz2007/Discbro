@@ -21,16 +21,21 @@ const comms = {
     ws_get: ws_get
 }
 
+window.comms = comms;
+
 // Caches
 const servers = {}; // id, name, pic, roles
 const channels = {}; // id, name, category, permissions
 const users = {}; // id, username, displayname, status, bio / activity
 const message_chunks = {};
 
+// Imports
+import * as page from "./page.js";
 
 // Receive requests
 socket.addEventListener("open", (event) => {
-    console.log("Connection opened! Yahoo!");
+    // Startup
+    ws_get("get_servers");
 });
 
 socket.addEventListener("message", (event) => {
@@ -46,9 +51,7 @@ socket.addEventListener("message", (event) => {
     let req, req_pos;
 
     // Find our beloved request
-    console.log(comms.reqs)
-    console.log(req_id)
-    for (let i = 0; i < comms.reqs; i++) {
+    for (let i = 0; i < comms.reqs.length; i++) {
         if (comms.reqs[i].req_id == req_id) {
             req = comms.reqs[i];
             req_pos = i;
@@ -64,12 +67,18 @@ socket.addEventListener("message", (event) => {
 
     // Now we can cook
 	switch (req.type) {
-        case "":
+        case "get_servers":
+            const servers = data.servers;
+            for (let i = 0; i < servers.length; i++) {
+                const server = servers[i];
+                page.create_server(server.id, server.name, server.image);
+            }
+            
             return;
     }
 
     // Remove request because it succeded
-    comms.reqs.splice(req_id, 1);
+    comms.reqs.splice(req_pos, 1);
     return true;
 });
 

@@ -22,10 +22,7 @@
 <body>
     <!-- Page -->
     <div id="sidebar">
-        <div id="servers">
-            <img src="/data/server-icons/1.png">
-            <img src="/data/server-icons/2.png">
-        </div>
+        <div id="servers"></div>
 
         <div id="channels">
             <h2>Server 1</h2>
@@ -78,6 +75,15 @@
             </div>
         </div>
     </div>
+
+    <!-- Create server -->
+    <div id="create-server">
+        <form id="server-create-form">
+            <input type="image" name="Server icon" />
+            <input type="text" placeholder="Server name" />
+            <input type="submit" name="Create" />
+        </form>
+    </div>
     
 
     <!-- Scripts -->
@@ -89,7 +95,9 @@
     </script>
 
     <script src="./cookies.js"></script>
-    <script src="./comms.js"></script>
+
+    <script type="module" src="./page.js"></script>
+    <script type="module" src="./comms.js"></script>
     <!--<script src="./script.js"></script>-->
 </body>
 

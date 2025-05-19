@@ -31,7 +31,7 @@ function new_user(username, display_name, password, email) {
     const hash = bcrypt.hashSync(password, salt_rounds);
 
     // Insert new user
-    const add_user = db.prepare("INSERT INTO users (username, display_name, password, profile_picture, email) VALUES (?, ?, ?, '/data/profile-pictures/default.png', ?)");
+    const add_user = db.prepare("INSERT INTO users (username, display_name, password, image, email) VALUES (?, ?, ?, '/data/user-image/1.png', ?)");
     let user = add_user.run(username, display_name, hash, email);
 
     if (user.changes == 0)
@@ -248,17 +248,71 @@ function get_channel_stats(id) {
 
 
 /// SERVERS ///
+function add_server(user_id, name, picture) {
+    // Valiodate someting¨
+
+    // Upload picture
+
+    // Make the server
+    const query = db.prepare(`
+        INSERT INTO servers (name, image, creator_id)
+        VALUES (?, ?, ?)`);
+    const result = query.run(name, "/data/server-image/default.png", user_id);
+
+    if (result.changes == 0)
+        return false;
+
+    // Add creator to it
+    const member_id = add_member(user_id, result.lastInsertRowid);
+    if (!member_id)
+        return false;
+
+    // Make default and admin role
+
+
+    // Give creator admin role
+
+
+    return true;
+}
+
 function get_user_servers(user_id) {
     const query = db.prepare(`
-        SELECT server_id AS id, name, icon
+        SELECT server_id AS id, name, image
         FROM servers, members
         WHERE members.user_id = ? AND servers.id = members.server_id`);
     const servers = query.all(user_id);
-    if (servers.length == 0)
-        return false;
 
     return servers;
 }
+
+
+/// MEMBERS ///
+function add_member(user_id, server_id) { // add auth code
+    const query = db.prepare(`
+        INSERT INTO members (user_id, server_id)
+        VALUES (?, ?)`);
+    const result = query2.run(user_id, server_id);
+    if (result.changes == 0)
+        return false;
+
+    return result.lastInsertRowid;
+}
+
+
+/// ROLES ///
+function add_role(server_id, name, color, perms) {
+    // For now, perms is a bool, 0 = default, 1 = admin
+    const query = db.prepare(`
+        INSERT INTO roles (name, color, server_id, admin)
+        VALUES (?, ?, ?, ?)`);
+    const result = query2.run(name, color, server_id, perms);
+    if (result.changes == 0)
+        return false;
+
+    return result.lastInsertRowid;
+}
+
 
 module.exports = {
     setup,
@@ -282,5 +336,6 @@ module.exports = {
     format_messages,
 
     // Server
+    add_server,
     get_user_servers
 }

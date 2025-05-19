@@ -4,6 +4,11 @@
 //  Stores and gets cookies the user has set. Disables / enables other scripts based off these settings.
 //
 
+const cookies = {
+    "necessary": ["comms.js"],
+    "marketing": ["ad_watcher.js"]
+}
+
 // Settings
 const settings = {
     cookie_name: "cookie-consent",
@@ -28,7 +33,7 @@ if (get_consent())
 // Events
 doc.querySelector("#cookies-decline-all").addEventListener("click", () => {
     set_consent({
-        "necessary": false,
+        "necessary": true,
         "analytics": false,
         "marketing": false
     })

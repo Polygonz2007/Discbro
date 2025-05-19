@@ -83,7 +83,13 @@ function get_channel(data, req, ws) {
 
 /// SERVERS ///
 function add_server(data, req, ws) {
-    return 0;
+    // Get user
+    const user_id = req.session.user_id;
+
+    // Add the server
+    const result = database.add_server(user_id, data.name, "");
+
+    return {"result": result};
 }
 
 function update_server(data, req, ws) {
@@ -120,6 +126,8 @@ module.exports = {
     get_channels,
 
     // Servers
+    add_server,
+    
     get_server,
     get_servers
 }
