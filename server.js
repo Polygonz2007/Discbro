@@ -79,7 +79,7 @@ app.get("/app/user/:username", page.profile);
 //app.get("/app", page.app);
 
 app.get("/api/get-theme", (req, res) => {
-    res.send(JSON.stringify({"theme": "dark"}));
+    res.send(JSON.stringify({"theme": "dark-contrast"}));
 })
 
 
@@ -181,9 +181,9 @@ function process_ws_req(data, req, ws) {
         case "get_roles": return;
 
         // Channels
-        //case "add_channel": websocket.add_channel(data, req, ws); return;
-        //case "update_channel": websocket.update_channel(data, req, ws); return;
-        //case "delete_channel": websocket.delete_channel(data, req, ws); return;
+        case "add_channel": websocket.add_channel(data, req, ws); return;
+        case "update_channel": websocket.update_channel(data, req, ws); return;
+        case "delete_channel": websocket.delete_channel(data, req, ws); return;
 
         case "get_channel": return websocket.get_channel(data, req, ws);
         case "get_channels": return websocket.get_channels(data, req, ws);
@@ -195,6 +195,9 @@ function process_ws_req(data, req, ws) {
 
         case "get_server": return websocket.get_server(data, req, ws);
         case "get_servers": return websocket.get_servers(data, req, ws);
+
+        // User
+        case "get_user": return websocket.get_user(data, req, ws);
 
         // Bad request? You get NOTHIN
         default: return {};

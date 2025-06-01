@@ -12,16 +12,18 @@
 // WebSockets
 const url = `ws://${window.location.host}`;
 const socket = new WebSocket(url);
-const comms = {
-    current_req_id: 0,
-    reqs: [],
 
-    successes: 0,
+// Variables accessible from other scripts
+let ready_resolve, ready_reject;
+export let ready = new Promise((resolve, reject) => { 
+    ready_resolve = resolve;
+    ready_reject = reject;
+});
 
-    ws_get: ws_get
-}
+export let current_req_id = 0;
+export let reqs = [];
+export let successes = 0;
 
-window.comms = comms;
 
 // Caches
 const servers = {}; // id, name, pic, roles
@@ -33,9 +35,9 @@ const message_chunks = {};
 import * as page from "./page.js";
 
 // Receive requests
-socket.addEventListener("open", (event) => {
+socket.addEventListener("open", async (event) => {
     // Startup
-    ws_get("get_servers");
+    ready_resolve();
 });
 
 socket.addEventListener("message", (event) => {
@@ -51,9 +53,9 @@ socket.addEventListener("message", (event) => {
     let req, req_pos;
 
     // Find our beloved request
-    for (let i = 0; i < comms.reqs.length; i++) {
-        if (comms.reqs[i].req_id == req_id) {
-            req = comms.reqs[i];
+    for (let i = 0; i < reqs.length; i++) {
+        if (reqs[i].req_id == req_id) {
+            req = reqs[i];
             req_pos = i;
         }
     }
@@ -65,26 +67,22 @@ socket.addEventListener("message", (event) => {
     const after = Date.now();
     console.log(`Request #${req.req_id} [${req.type}]\nTrip time: ${after - req.time_sent}ms`);
 
+    // Do it
+    req.resolve(data);
+
     // Now we can cook
 	switch (req.type) {
-        case "get_servers":
-            const servers = data.servers;
-            for (let i = 0; i < servers.length; i++) {
-                const server = servers[i];
-                page.create_server(server.id, server.name, server.image);
-            }
-            
-            return;
+
     }
 
     // Remove request because it succeded
-    comms.reqs.splice(req_pos, 1);
+    reqs.splice(req_pos, 1);
     return true;
 });
 
 
 // Functions to make requests and parse them
-function ws_get(type, parameters) {
+export function ws_req(type, parameters) {
     // Create what we send
     if (!type)
         return;
@@ -95,18 +93,25 @@ function ws_get(type, parameters) {
     parameters.type = type;
 
     // Create ID for this request
-    comms.current_req_id++;
-    const req_id = comms.current_req_id;
+    current_req_id++;
+    const req_id = current_req_id;
 
     parameters.req_id = req_id;
-    comms.reqs.push({
-        req_id: req_id,
-        type: type,
-        time_sent: Date.now()
-    });
 
     // Send!
     const payload = JSON.stringify(parameters);
     socket.send(payload);
-    return true;
+
+    // Make promise for result, add the req
+    return new Promise((resolve, reject) => {
+        // And add the req to buffer
+        reqs.push({
+            req_id: req_id,
+            type: type,
+            time_sent: Date.now(),
+
+            resolve: resolve,
+            reject: reject
+        });
+    });
 }

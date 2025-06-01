@@ -109,26 +109,17 @@ function get_group_members() {
     return true;
 }
 
-// Get all messages in a channel
-function get_messages(channelid) {
-    const query = db.prepare("SELECT * FROM messages WHERE channelid = ? ORDER BY id DESC");
-    let result = query.all(channelid);
-
-    if (result.length != 0)
-        return result;
-
-    return false;
-}
-
 // Gets a chunk of messages, of size chunk_s
 // If dir is false, it reads messages BEFORE lastid
 // Else, if dir is true, it reads messages AFTER lastid
 // If no lastid is specified, it gets the newest chunk
-function get_message_chunk(channel_id, dir = false, last_id, chunk_s) {
+function get_messages(channel_id, amount, anchor, direction) {
     // If empty, get newest
-    if (last_id == null) {
+    if (anchor == null) {
+        console.log("no ancgir")
         const query = db.prepare(`SELECT * FROM messages WHERE channel_id = ? ORDER BY id DESC LIMIT ?`);
-        let result = query.all(channel_id, chunk_s);
+        let result = query.all(channel_id, amount);
+        console.log(result)
         if (result.length == 0) // If empty, return error
             return false;
 
@@ -136,13 +127,13 @@ function get_message_chunk(channel_id, dir = false, last_id, chunk_s) {
     }
 
     // We need to find the chunk we are looking for
-    const query = db.prepare(`SELECT * FROM messages WHERE id ${dir ? ">" : "<"} ? AND channel_id = ? ORDER BY id ${dir ? "ASC" : "DESC"} LIMIT ?`);
-    let result = query.all(last_id, channel_id, chunk_s);
+    const query = db.prepare(`SELECT * FROM messages WHERE id ${direction ? ">" : "<"} ? AND channel_id = ? ORDER BY id ${direction ? "ASC" : "DESC"} LIMIT ?`);
+    let result = query.all(anchor, channel_id, amount);
     if (result.length == 0) // If empty, return error
         return false;
 
     // Flip order of chunk when reading old messages
-    if (!dir)
+    if (!direction)
         result.reverse();
 
     return result;
@@ -262,16 +253,23 @@ function add_server(user_id, name, picture) {
     if (result.changes == 0)
         return false;
 
+    const server_id = result.lastInsertRowid;
+
     // Add creator to it
-    const member_id = add_member(user_id, result.lastInsertRowid);
+    const member_id = add_member(user_id, server_id);
     if (!member_id)
         return false;
 
     // Make default and admin role
-
+    const default_role_id = add_role(server_id, "default", "#888888", false);
+    const admin_role_id = add_role(server_id, "admin", "#ffffff", true);
+    if (!default_role_id || !admin_role_id)
+        return false;
 
     // Give creator admin role
-
+    const role_add_check = add_member_role(member_id, admin_role_id);
+    if (!role_add_check)
+        return false;
 
     return true;
 }
@@ -292,7 +290,7 @@ function add_member(user_id, server_id) { // add auth code
     const query = db.prepare(`
         INSERT INTO members (user_id, server_id)
         VALUES (?, ?)`);
-    const result = query2.run(user_id, server_id);
+    const result = query.run(user_id, server_id);
     if (result.changes == 0)
         return false;
 
@@ -306,11 +304,34 @@ function add_role(server_id, name, color, perms) {
     const query = db.prepare(`
         INSERT INTO roles (name, color, server_id, admin)
         VALUES (?, ?, ?, ?)`);
-    const result = query2.run(name, color, server_id, perms);
+    const result = query.run(name, color, server_id, perms);
     if (result.changes == 0)
         return false;
 
     return result.lastInsertRowid;
+}
+
+function add_member_role(member_id, role_id) {
+    // For now, perms is a bool, 0 = default, 1 = admin
+    const query = db.prepare(`
+        INSERT INTO member_roles (member_id, role_id)
+        VALUES (?, ?)`);
+    const result = query.run(member_id, role_id);
+    if (result.changes == 0)
+        return false;
+
+    return result.lastInsertRowid;
+}
+
+function get_user_perms(user_id, server_id) {
+    // Get all roles they have in server, and return highest of each
+    const query = db.prepare(`
+        SELECT admin FROM `); // finish this
+    const result = query.run(member_id, role_id);
+    if (result.changes == 0)
+        return false;
+
+    return result;
 }
 
 
@@ -332,7 +353,6 @@ module.exports = {
 
     get_message,
     get_messages,
-    get_message_chunk,
     format_messages,
 
     // Server

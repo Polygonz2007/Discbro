@@ -11,6 +11,9 @@ function add_message(data, req) {
     if (!data.author_id)
         return false;
 
+    // Check that the user has access to channel
+    
+
     // Sanetize
     //data.content = format.escape_html(data.content);
     
@@ -22,7 +25,7 @@ function add_message(data, req) {
     // Share new message with all connected clients (IN THIS CHANNEL) (OH NO)
     const messages = database.format_messages([database.get_message(message_id)], req.session.user_id);
     global.wss.clients.forEach((client) => {
-        client.send(JSON.stringify({ "type": "message", "channel_id": data.channel_id, "dir": true, "messages": messages }));
+        client.send(JSON.stringify({ "type": "message_added", "channel_id": data.channel_id, "dir": true, "messages": messages }));
     });
 
     return {};
@@ -51,8 +54,10 @@ function delete_message(data, req, ws) {
 
 // Get a chunk of messages
 function get_messages(data, req, ws) {
+    console.log(data)
+
     // Get messages, if there are none tell client we are up to date, if not send the messages
-    let messages = database.get_message_chunk(data.channel_id, data.dir, data.last_id, data.chunk_s);
+    let messages = database.get_messages(data.channel_id, data.amount, data.anchor, data.direction);
     if (!messages)
         messages = [];
     else
@@ -60,10 +65,24 @@ function get_messages(data, req, ws) {
 
     return {
         "channel_id": data.channel_id,
-        "dir": data.dir,
+        "direction": data.dir,
         "messages": messages,
-        "up_to_date": messages.length == 0 || data.last_id == null
+        "up_to_date": messages.length == 0 || data.anchor == null
     };
+}
+
+
+/// CHANNELS ///
+function add_channel(data, req, ws) {
+    return 0;
+}
+
+function update_channel(data, req, ws) {
+    return 0;
+}
+
+function delete_channel(data, req, ws) {
+    return 0;
 }
 
 function get_channels(data, req, ws) {
@@ -80,6 +99,7 @@ function get_channel(data, req, ws) {
         "name": channel.name
     };
 }
+
 
 /// SERVERS ///
 function add_server(data, req, ws) {
@@ -114,6 +134,20 @@ function get_servers(data, req, ws) {
     return {"servers": servers};
 }
 
+/// USERS ///
+function get_user(data, req, ws) {
+    // If no ID is given, we try to use the request-ers id.
+    if (!data.user_id)
+         data.user_id = req.session.user_id
+
+    if (!data.user_id)
+        return false;
+
+    // We have an ID to use
+    const user = database.get_user_info(data.user_id);
+    return {"user": user};
+}
+
 module.exports = {
     // Messages
     add_message,
@@ -129,5 +163,8 @@ module.exports = {
     add_server,
     
     get_server,
-    get_servers
+    get_servers,
+
+    // Users
+    get_user
 }

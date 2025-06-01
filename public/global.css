@@ -43,11 +43,11 @@ input {
 }
 
 input[type=text]:focus {
-    background-color: var(--selected-color);
+    background-color: var(--top-color-hover);
 }
 
 input:active {
-    background-color: var(--selected-color);
+    background-color: var(--top-color-hover);
 }
 
 input.invalid {

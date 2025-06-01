@@ -2,7 +2,7 @@
 /** Preferences **/
 :root { /* Default theme: dark */
     /* Dimensions */
-    --sidebar-width: 24rem;
+    --sidebar-width: 25rem;
     --message-box-height: 3.5rem;
     --segment-padding: 0.3rem;
     --scrollbar-padding: 1rem;
@@ -34,6 +34,10 @@
     --middle-color: #234; /* 234 */
     --top-color: #345; /* 345 */
     --selected-color: #DDD;
+
+    --back-color-hover: color-mix(in srgb, var(--back-color) 65%, #FFF 35%);
+    --middle-color-hover: color-mix(in srgb, var(--middle-color) 65%, #FFF 35%);
+    --top-color-hover: color-mix(in srgb, var(--top-color) 65%, #FFF 35%);
 
     --text-color: #FFF;
     --light-text-color: #FFFE;

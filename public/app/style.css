@@ -160,6 +160,8 @@ span.divider {
     box-sizing: border-box;
 
     background-color: var(--middle-color);
+
+    box-shadow: #0002 0 0 2rem;
 }
 
 a {
@@ -200,10 +202,14 @@ input[type=checkbox] {
     position: absolute;
     display: flex;
 
-    height: var(--user-box-height);
-    width: calc(var(--sidebar-width) - var(--segment-padding) * 2); 
+    height: calc(var(--user-box-height) + 1rem);
+    width: var(--sidebar-width); /*calc(var(--sidebar-width) - var(--segment-padding) * 2); */
 
-    bottom: var(--segment-padding);
+    left: 0;
+    bottom: 0; /*var(--segment-padding);*/
+
+    padding: 0.5rem;
+    box-sizing: border-box;
 
     background-color: var(--top-color);
 }
@@ -216,6 +222,7 @@ input[type=checkbox] {
 #user > div {
     flex-grow: 2;
     display: block;
+    margin-left: 0.33rem;
 }
 
 #user > img {
@@ -252,19 +259,37 @@ input[type=checkbox] {
 
 
 /* Channels */
-#channels {
+#channel-panel {
     position: fixed;
     top: 0;
     left: 6rem;
 }
 
-.active {
+.channel[open] {
+    background-color: var(--top-color-hover);
     font-weight: bold;
+}
+
+ul {
+    padding-left: 0rem;
+    width: 100%;
 }
 
 li {
     margin-bottom: 0.35rem;
-    margin-left: 1.5rem;
+
+    list-style-type: none;
+
+    background-color: var(--top-color);
+    padding: 0.5rem;
+    padding-left: 1.5rem;
+
+    width: 100%;
+    box-sizing: border-box;
+}
+
+li:hover {
+    background-color: var(--top-color-hover);
 }
 
 /* Servers */
@@ -277,7 +302,8 @@ li {
 
     width: 4rem;
     height: 100%;
-    background-color: var(--top-color);
+
+    border-right: solid 0.2rem var(--top-color);
 }
 
 #servers > img {

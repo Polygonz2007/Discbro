@@ -24,12 +24,13 @@
     <div id="sidebar">
         <div id="servers"></div>
 
-        <div id="channels">
-            <h2>Server 1</h2>
+        <div id="channel-panel">
+            <h2 id="server-name"></h2>
+            <ul id="channels"></ul>
         </div>
 
         <div id="user">
-            <img src="/data/profile-pictures/default.png" />
+            <img src="/data/user-image/default.png" />
             
             <div>
                 <p id="displayname">Polygonz</p>
@@ -75,15 +76,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Create server -->
-    <div id="create-server">
-        <form id="server-create-form">
-            <input type="image" name="Server icon" />
-            <input type="text" placeholder="Server name" />
-            <input type="submit" name="Create" />
-        </form>
-    </div>
     
 
     <!-- Scripts -->
@@ -96,9 +88,12 @@
 
     <script src="./cookies.js"></script>
 
+    <!-- Import Modules -->
     <script type="module" src="./page.js"></script>
     <script type="module" src="./comms.js"></script>
-    <!--<script src="./script.js"></script>-->
+
+    <!-- The App itself -->
+    <script type="module" src="./app.js"></script>
 </body>
 
 </html>

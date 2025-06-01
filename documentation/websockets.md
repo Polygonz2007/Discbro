@@ -29,7 +29,7 @@ get_server_members (amount, anchor, filter)
 - anchor is anything over anchor is ignored, like an offset
 - filter lets client search for specific stuff (search by name, show only people with role, show only friends, etc)
 
-get_message_chunk (channel_id, amount, anchor, direction) (you need acces to channel to run this)
+get_messages (channel_id, amount, anchor, direction) (you need acces to channel to run this)
 - if direction is true (newer) and anchor is 0, gets the newest messages.
 - if anchor is not 0, is fetches only messages above or below anchor (depending on direction)
 

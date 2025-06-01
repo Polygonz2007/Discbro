@@ -47,7 +47,7 @@ create table roles (
 
     admin TINYINT NOT NULL -- 0: no admin 😂, 1: admin 😎
     -- add more perms later, admin just has all perms for now
-)
+);
 
 create table members (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,7 +61,7 @@ create table member_roles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     member_id UNSIGNED INT REFERENCES members(id), -- the member that has this role, specifies both user and server! this dissapears after leaving a server too ❤
     role_id UNSIGNED INT REFERENCES roles(id) -- and the role the member has, a member can have as many as they like
-)
+);
 
 create table categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -87,12 +87,3 @@ create table messages (
     content varchar(2048) NOT NULL,
     time UNSIGNED INT NOT NULL DEFAULT (strftime('%s', 'now'))
 );
-
--- Init
-insert into servers (name) values ('Main');
-insert into channels (name, server_id) values ('general', 1);
-insert into channels (name, server_id) values ('quotes', 1);
-
-insert into servers (name) values ('Second Server');
-insert into channels (name, server_id) values ('general', 2);
-insert into channels (name, server_id) values ('second-server-is-better', 2);
