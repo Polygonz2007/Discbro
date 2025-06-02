@@ -45,39 +45,51 @@ socket.addEventListener("message", (event) => {
 	const data = JSON.parse(event.data);
 	console.log(data);
 
-    // Chech with reqs buffer
-    if (!data.req_id)
-        return false; // No req_id? Invalid!
+    // Check if it is our request or request from server
+    if (data.req_id) {
 
-    const req_id = data.req_id;
-    let req, req_pos;
+        // We made this request, figure out what we did and do based of that
+        const req_id = data.req_id;
+        let req, req_pos;
 
-    // Find our beloved request
-    for (let i = 0; i < reqs.length; i++) {
-        if (reqs[i].req_id == req_id) {
-            req = reqs[i];
-            req_pos = i;
+        // Find our beloved request
+        for (let i = 0; i < reqs.length; i++) {
+            if (reqs[i].req_id == req_id) {
+                req = reqs[i];
+                req_pos = i;
+            }
         }
+
+        if (!req)
+            return false;
+
+        // Log time taken
+        const after = Date.now();
+        console.log(`Request #${req.req_id} [${req.type}]\nTrip time: ${after - req.time_sent}ms`);
+
+        // Do it
+        req.resolve(data);
+
+        // Remove request because it succeded
+        reqs.splice(req_pos, 1);
+        return true;
+    
+    } else {
+
+        // Server is telling us something, listen and execute based off what it is
+        const type = data.type;
+        switch (type) {
+            case "message_added":
+                // Add the message if in same channel as us
+                if (data.channel_id != window.app.state.channel)
+                    return false; // In future, show as notif in that channel / server
+
+                page.create_message(data.messages[0]);
+
+                return true;
+        }
+
     }
-
-    if (!req)
-        return false;
-
-    // Log time taken
-    const after = Date.now();
-    console.log(`Request #${req.req_id} [${req.type}]\nTrip time: ${after - req.time_sent}ms`);
-
-    // Do it
-    req.resolve(data);
-
-    // Now we can cook
-	switch (req.type) {
-
-    }
-
-    // Remove request because it succeded
-    reqs.splice(req_pos, 1);
-    return true;
 });
 
 

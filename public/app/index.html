@@ -22,15 +22,18 @@
 <body>
     <!-- Page -->
     <div id="sidebar">
-        <div id="servers"></div>
+        <div id="servers">
+            <img src="" id="create-server-button">
+        </div>
 
         <div id="channel-panel">
             <h2 id="server-name"></h2>
-            <ul id="channels"></ul>
+            <ul id="channels"> </ul>
+            <li id="create-channel-button">Make a new channel</li>
         </div>
 
         <div id="user">
-            <img src="/data/user-image/default.png" />
+            <img id="profile-picture" src="/data/user-image/default.png" />
             
             <div>
                 <p id="displayname">Polygonz</p>
@@ -38,8 +41,8 @@
                 <p id="status">Online</p>
             </div>
 
-            <a href="/app/user/1"><img src="/graphics/icon/profile.svg" class="icon img-btn"></a>
-            <a href="/app/settings"><img src="/graphics/icon/settings.svg" class="icon img-btn"></a>
+            <a id="account" href="/app/user/1"><img src="/graphics/icon/profile.svg" class="icon img-btn"></a>
+            <a id="settings" href="/app/settings"><img src="/graphics/icon/settings.svg" class="icon img-btn"></a>
         </div>
     </div>
 
@@ -91,6 +94,7 @@
     <!-- Import Modules -->
     <script type="module" src="./page.js"></script>
     <script type="module" src="./comms.js"></script>
+    <script type="module" src="./form.js"></script>
 
     <!-- The App itself -->
     <script type="module" src="./app.js"></script>

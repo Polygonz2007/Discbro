@@ -200,7 +200,7 @@ function process_ws_req(data, req, ws) {
         case "get_user": return websocket.get_user(data, req, ws);
 
         // Bad request? You get NOTHIN
-        default: return {};
+        default: return {"result": false};
     }
 }
 

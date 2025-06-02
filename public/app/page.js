@@ -9,10 +9,19 @@
 import * as comms from "./comms.js";
 
 // Displaying info
-// Servers
+// Divs
 export const server_list = doc.querySelector("#servers");
 export const channel_list = doc.querySelector("#channels");
+export const message_box = doc.querySelector("#message-box");
 
+// Info
+export const server_name = doc.querySelector("#server-name");
+
+// Buttons
+export const create_server_btn = doc.querySelector("#create-server-button");
+export const create_channel_btn = doc.querySelector("#create-channel-button");
+
+// Servers
 export function create_server(id, name, image) {
     server_list.innerHTML += `<img src="${image}" server_id="${id}" server_name="${name}" alt="${name}" title="${name}" onclick="window.app.open_server(${id})" />`;
     return true;
@@ -93,16 +102,54 @@ export async function display_channel(channel_id) {
 
 // Messages
 export function create_message(message) {
-    const element = doc.createElement("p");
-    element.classList.add("message");
+    // Get data stuff
+    const author = message.author; // get from somehwree else maybe
+    const user_link = `/app/user/${message.author.username}`;
 
     const datetime = new Date(message.time * 1000);
-    const message_time = datetime.toLocaleString();
+    const timestamp = datetime.toLocaleString();
 
-    element.innerHTML = `[@${message.author.username}, ${message_time}]: ${message.content}`;
-    body.appendChild(element);
+    // Create the message
+    const container = doc.createElement("div");
+    container.classList.add("message");
+    container.setAttribute("message_id", message.id);
 
-    return element;
+    // User image
+    const image_link = doc.createElement("a");
+    image_link.setAttribute("href", user_link);
+
+    const image = doc.createElement("img");
+    image.setAttribute("src", `/data/user-image/${author.id}.png`);
+    image.classList.add("pfp");
+
+    // Message itself
+    const text_container = doc.createElement("div");
+
+    const author_text = doc.createElement("a");
+    author_text.classList.add("author");
+    author_text.setAttribute("href", user_link);
+    author_text.innerHTML = `${author.display_name} [@${author.username}]`;
+
+    const timestamp_text = doc.createElement("p");
+    timestamp_text.classList.add("timestamp");
+    timestamp_text.innerHTML = timestamp;
+
+    const content_text = doc.createElement("p");
+    content_text.classList.add("content");
+    content_text.innerHTML = message.content;
+
+    // Add it all togheter
+    image_link.appendChild(image);
+    container.appendChild(image_link);
+
+    text_container.appendChild(author_text);
+    text_container.appendChild(timestamp_text);
+    text_container.appendChild(content_text);
+    container.appendChild(text_container);
+
+    body.appendChild(container);
+
+    return container;
 }
 
 export function clear_messages() {

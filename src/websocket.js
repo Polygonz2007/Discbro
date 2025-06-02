@@ -2,6 +2,12 @@
 const database = require("./database.js");
 const format = require("./format.js");
 
+// Helping hands ❤ //
+const response = {};
+response.error = {"result": false};
+response.success = {"result": true};
+
+
 ///  FUNCTIONS  ///
 // Message sent by client
 function add_message(data, req) {
@@ -9,7 +15,7 @@ function add_message(data, req) {
     const user = database.get_user_info(req.session.user_id);
     data.author_id = user.id;
     if (!data.author_id)
-        return false;
+        return response.error;
 
     // Check that the user has access to channel
     
@@ -20,7 +26,7 @@ function add_message(data, req) {
     // Store in database
     const message_id = database.add_message(data.channel_id, data.author_id, data.content);
     if (!message_id)
-        return;
+        return response.error;
 
     // Share new message with all connected clients (IN THIS CHANNEL) (OH NO)
     const messages = database.format_messages([database.get_message(message_id)], req.session.user_id);
@@ -28,7 +34,7 @@ function add_message(data, req) {
         client.send(JSON.stringify({ "type": "message_added", "channel_id": data.channel_id, "dir": true, "messages": messages }));
     });
 
-    return {};
+    return response.success;
 }
 
 function update_message(data, req, ws) {
@@ -46,10 +52,10 @@ function delete_message(data, req, ws) {
 
     // Get and check perms
     if (message.author_id != req.session.user_id) // || !check_perms(user.id, "admin")
-        return false;
+        return response.error;
 
     database.delete_message(message_id);
-    return {"state": "success"};
+    return response.success;
 }
 
 // Get a chunk of messages
@@ -108,8 +114,10 @@ function add_server(data, req, ws) {
 
     // Add the server
     const result = database.add_server(user_id, data.name, "");
-
-    return {"result": result};
+    if (!result)
+        return response.error;
+    else
+        return response.success;
 }
 
 function update_server(data, req, ws) {

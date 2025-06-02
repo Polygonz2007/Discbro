@@ -33,11 +33,11 @@
     --back-color: #123; /* 123 */
     --middle-color: #234; /* 234 */
     --top-color: #345; /* 345 */
-    --selected-color: #DDD;
+    --selected-color: #AAA8;
 
-    --back-color-hover: color-mix(in srgb, var(--back-color) 65%, #FFF 35%);
-    --middle-color-hover: color-mix(in srgb, var(--middle-color) 65%, #FFF 35%);
-    --top-color-hover: color-mix(in srgb, var(--top-color) 65%, #FFF 35%);
+    --back-color-hover: color-mix(in srgb, var(--back-color) 65%, #CCC 35%);
+    --middle-color-hover: color-mix(in srgb, var(--middle-color) 65%, #CCC 35%);
+    --top-color-hover: color-mix(in srgb, var(--top-color) 65%, #CCC 35%);
 
     --text-color: #FFF;
     --light-text-color: #FFFE;

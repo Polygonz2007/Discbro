@@ -6,6 +6,7 @@
 
 import * as page from "./page.js";
 import * as comms from "./comms.js";
+import { Form } from "./form.js";
 
 const App = new class {
     constructor() {
@@ -38,6 +39,9 @@ const App = new class {
         this.user = user;
         doc.querySelector("#displayname").innerHTML = user.display_name;
         doc.querySelector("#username").innerHTML = `@${user.username}`;
+        doc.querySelector("#profile-picture").src = `/data/user-image/${user.id}.png`;
+
+        doc.querySelector("#account").href = `/app/user/${user.username}`;
 
         // Get servers
         const { servers } = await comms.ws_req("get_servers");
@@ -56,11 +60,15 @@ const App = new class {
     async open_server(server_id) {
         // Set it to be opened
         this.state.server = server_id;
+        page.server_name.innerHTML = "";
 
         // Get channels
         const { channels } = await comms.ws_req("get_channels", {"server_id": server_id});
-        if (!channels)
+        if (!channels) {
             page.channel_list.innerHTML = "There are no channels here yet.";
+            page.clear_messages();
+            return false;
+        }
 
         page.channel_list.innerHTML = "";
         for (let i = 0; i < channels.length; i++) {
@@ -70,10 +78,7 @@ const App = new class {
         }
 
         // Open first one (replace wirh last opened afterwards)
-        if (!channels || channels.length == 0)
-            page.clear_messages(); // Remove odl channel
-        else
-            this.open_channel(channels[0].id) // Load new channel
+        this.open_channel(channels[0].id);
     }
 
     async open_channel(channel_id) {
@@ -164,8 +169,57 @@ const App = new class {
         // We now have oldest message
         return {"element": messages[newest_idx], "id": newest_id};
     }
+
+    // Interaction
+    async post_message() {
+        // Check that we can
+        if (!this.state.channel)
+            return false;
+
+        if (page.message_box.value == "")
+            return false;
+
+        // Compose data
+        const params = {
+            channel_id: this.state.channel,
+            content: page.message_box.value
+        };
+
+        const { result } = await comms.ws_req("add_message", params);
+        if (result) // Clear message box if it was sent
+            page.message_box.value = "";
+
+        return result;
+    }
 }
 
 // Start it up
 App.init();
 window.app = App;
+
+// Posting messages
+page.message_box.addEventListener("keydown", (e) => {
+	if (e.key == 'Enter') { App.post_message(); }
+});
+
+// creating server
+page.create_server_btn.addEventListener("click", async () => {
+    const form = new Form("Create Server", "Create!");
+    form.add_input("text", "Server Name", "name", "The name of your server");
+    // Add image, description n' stuff later
+
+    const result = await form.query();
+    console.log(result)
+    comms.ws_req("add_server", result);
+});
+
+// creating channel
+page.create_channel_btn.addEventListener("click", async () => {
+    const form = new Form("Create Channel", "Create!");
+    form.add_input("text", "Channel Name", "name", "The name of your server");
+    // Add image, description n' stuff later
+
+    const result = await form.query();
+    console.log(result)
+    comms.ws_req("add_server", result);
+});

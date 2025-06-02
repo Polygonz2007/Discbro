@@ -304,7 +304,7 @@ function add_role(server_id, name, color, perms) {
     const query = db.prepare(`
         INSERT INTO roles (name, color, server_id, admin)
         VALUES (?, ?, ?, ?)`);
-    const result = query.run(name, color, server_id, perms);
+    const result = query.run(name, color, server_id, perms ? 1 : 0);
     if (result.changes == 0)
         return false;
 

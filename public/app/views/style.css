@@ -1,4 +1,17 @@
-#userbox > div {
-    display: inline-block;
+#userbox {
+    display: flex;
+    flex-direction: row;
+
+    height: 12rem;
+    background-color: #FFF4;
+
     vertical-align: top;
+}
+
+#userbox > * {
+    margin: 1rem;
+}
+
+img {
+    border-radius: 0.5rem;
 }
