@@ -181,9 +181,9 @@ function process_ws_req(data, req, ws) {
         case "get_roles": return;
 
         // Channels
-        case "add_channel": websocket.add_channel(data, req, ws); return;
-        case "update_channel": websocket.update_channel(data, req, ws); return;
-        case "delete_channel": websocket.delete_channel(data, req, ws); return;
+        case "add_channel": return websocket.add_channel(data, req, ws);;
+        case "update_channel": return websocket.update_channel(data, req, ws);;
+        case "delete_channel": return websocket.delete_channel(data, req, ws);;
 
         case "get_channel": return websocket.get_channel(data, req, ws);
         case "get_channels": return websocket.get_channels(data, req, ws);
@@ -203,16 +203,6 @@ function process_ws_req(data, req, ws) {
         default: return {"result": false};
     }
 }
-
-
-
-
-
-
-
-
-
-
 
 // Not found page
 app.use("*", (req, res) => {

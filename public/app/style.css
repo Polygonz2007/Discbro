@@ -33,6 +33,8 @@ input {
     border: none;
     border-radius: 0;
     background-color: var(--top-color);
+    
+    z-index: 5;
 }
 
 label, input[type=submit] {
@@ -273,7 +275,7 @@ input[type=checkbox] {
 }
 
 .channel[open] {
-    background-color: var(--top-color-hover);
+    background-color: var(--top-color);
     font-weight: bold;
 }
 
@@ -287,16 +289,23 @@ li {
 
     list-style-type: none;
 
-    background-color: var(--top-color);
+    background-color: var(--middle-color);
     padding: 0.5rem;
     padding-left: 1.5rem;
 
     width: 100%;
     box-sizing: border-box;
+
+    border-bottom: solid 0.2rem var(--back-color);
+    box-shadow: #0002 0 0 0.25rem;
 }
 
 li:hover {
-    background-color: var(--top-color-hover);
+    background-color: var(--top-color);
+}
+
+#create-channel-button {
+    background-color: var(--top-color);
 }
 
 /* Servers */
@@ -313,9 +322,19 @@ li:hover {
     border-right: solid 0.2rem var(--top-color);
 }
 
-#servers > img {
+#servers > button {
     width: 4rem;
     height: 4rem;
+    box-sizing: border-box;
+
+    background: none;
+    border: none;
+    outline: none;
+    padding: 0;
+}
+
+#servers > button > img {
+    width: 100%; height: 100%;
     object-fit: cover;
 }
 

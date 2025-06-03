@@ -64,6 +64,13 @@ export class Form {
 
         this.html.appendChild(this.submit_btn);
 
+        // and cancel button
+        this.cancel_btn = doc.createElement("button");
+        this.cancel_btn.innerHTML = "Cancel";
+
+        this.html.appendChild(this.cancel_btn);
+
+
         return true;
     }
     
@@ -76,7 +83,6 @@ export class Form {
 
         // Wait for submit
         this.submit_btn.addEventListener("click", (event) => {
-            console.log("u lcicked")
             event.preventDefault();
 
             // Get result
@@ -98,6 +104,10 @@ export class Form {
 
             // Return
             this.resolve(result);
+        });
+
+        this.cancel_btn.addEventListener("click", (event) => {
+            this.resolve(false);
         });
 
         // Return promise that can be resolved by click function

@@ -8,7 +8,7 @@ import * as page from "./page.js";
 import * as comms from "./comms.js";
 import { Form } from "./form.js";
 
-const App = new class {
+export const App = new class {
     constructor() {
         // Settings
         this.settings = {};
@@ -50,7 +50,8 @@ const App = new class {
         // Display them
         for (let i = 0; i < this.servers.length; i++) {
             const server = this.servers[i];
-            page.create_server(server.id, server.name, server.image);
+            const button = page.create_server(server.id, server.name, server.image);
+            button.addEventListener("click", ev => this.open_server(server.id));
         }
 
         // Open first one
@@ -60,7 +61,7 @@ const App = new class {
     async open_server(server_id) {
         // Set it to be opened
         this.state.server = server_id;
-        page.server_name.innerHTML = "";
+        page.server_name.innerHTML = doc.querySelector(`[server_id="${server_id}"]`).getAttribute("server_name");
 
         // Get channels
         const { channels } = await comms.ws_req("get_channels", {"server_id": server_id});
@@ -74,7 +75,7 @@ const App = new class {
         for (let i = 0; i < channels.length; i++) {
             const channel = channels[i];
             const element = page.create_channel(channel);
-            element.addEventListener("click", () => { this.open_channel(channel.id); });
+            element.addEventListener("click", ev => { this.open_channel(channel.id); });
         }
 
         // Open first one (replace wirh last opened afterwards)
@@ -203,23 +204,30 @@ page.message_box.addEventListener("keydown", (e) => {
 });
 
 // creating server
+const btn = page.create_server_btn;
 page.create_server_btn.addEventListener("click", async () => {
     const form = new Form("Create Server", "Create!");
     form.add_input("text", "Server Name", "name", "The name of your server");
     // Add image, description n' stuff later
 
     const result = await form.query();
-    console.log(result)
-    comms.ws_req("add_server", result);
+    if (result)
+        comms.ws_req("add_server", result);
 });
 
 // creating channel
 page.create_channel_btn.addEventListener("click", async () => {
     const form = new Form("Create Channel", "Create!");
-    form.add_input("text", "Channel Name", "name", "The name of your server");
+    form.add_input("text", "Channel Name", "name", "The name of the channel");
     // Add image, description n' stuff later
 
     const result = await form.query();
-    console.log(result)
-    comms.ws_req("add_server", result);
+    if (result) {
+        // Find which server is open
+        const server_id = App.state.server;
+        result["server_id"] = server_id;
+
+        // Do it
+        comms.ws_req("add_channel", result);
+    }
 });

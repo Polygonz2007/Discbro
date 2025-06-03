@@ -240,8 +240,6 @@ function get_channel_stats(id) {
 
 /// SERVERS ///
 function add_server(user_id, name, picture) {
-    // Valiodate someting¨
-
     // Upload picture
 
     // Make the server
@@ -284,6 +282,18 @@ function get_user_servers(user_id) {
     return servers;
 }
 
+/// CHANNELS ///
+function add_channel(server_id, name) {
+    const query = db.prepare(`
+        INSERT INTO channels (server_id, name)
+        VALUES (?, ?)`);
+    const result = query.run(server_id, name);
+
+    if (result.changes == 0)
+        return false;
+
+    return true;
+}
 
 /// MEMBERS ///
 function add_member(user_id, server_id) { // add auth code
@@ -324,12 +334,18 @@ function add_member_role(member_id, role_id) {
 }
 
 function get_user_perms(user_id, server_id) {
+    console.log(`Finding perms for server #${server_id} and user #${user_id}`);
+
     // Get all roles they have in server, and return highest of each
     const query = db.prepare(`
-        SELECT admin FROM `); // finish this
-    const result = query.run(member_id, role_id);
-    if (result.changes == 0)
-        return false;
+        SELECT admin
+        FROM members
+        INNER JOIN member_roles ON member_roles.member_id = members.id
+        INNER JOIN roles ON member_roles.role_id = roles.id
+        WHERE members.user_id = ? AND members.server_id = ?`); // finish this
+    const result = query.get(user_id, server_id);
+    if (!result)
+        return {"admin": false};
 
     return result;
 }
@@ -357,5 +373,11 @@ module.exports = {
 
     // Server
     add_server,
-    get_user_servers
+    get_user_servers,
+
+    // Channel
+    add_channel,
+
+    // Roles
+    get_user_perms
 }

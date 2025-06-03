@@ -66,14 +66,14 @@ label {
     width: 80vw;
 }
 
-/* Highlight image buttons */
+/* Highlight image buttons */ /*
 a:has(.img-btn):hover {
     filter: drop-shadow(var(--weak-text-color) 0 0 var(--text-size-small));
 }
 
 a:has(.img-btn):active {
     filter: drop-shadow(var(--weak-text-color) 0 0 var(--text-size-small)) drop-shadow(var(--weak-text-color) 0 0 var(--text-size-default));
-}
+} */
 
 /* Light Mode Icons */
 :root[theme="light"] {
@@ -81,4 +81,8 @@ a:has(.img-btn):active {
         filter: brightness(0);
     }
     
+}
+
+img:hover {
+    filter: brightness(80%);
 }

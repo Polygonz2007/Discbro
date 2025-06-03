@@ -80,7 +80,20 @@ function get_messages(data, req, ws) {
 
 /// CHANNELS ///
 function add_channel(data, req, ws) {
-    return 0;
+    // Get user
+    const user_id = req.session.user_id;
+
+    // Check if they have the perms
+    const { admin } = database.get_user_perms(user_id, data.server_id);
+    if (!admin)
+        return response.error;
+
+    // Add the server
+    const result = database.add_channel(data.server_id, data.name); // add more stuyff later
+    if (!result)
+        return response.error;
+    
+    return response.success;
 }
 
 function update_channel(data, req, ws) {
@@ -116,8 +129,8 @@ function add_server(data, req, ws) {
     const result = database.add_server(user_id, data.name, "");
     if (!result)
         return response.error;
-    else
-        return response.success;
+    
+    return response.success;
 }
 
 function update_server(data, req, ws) {
@@ -166,6 +179,7 @@ module.exports = {
     // Channels
     get_channel,
     get_channels,
+    add_channel,
 
     // Servers
     add_server,

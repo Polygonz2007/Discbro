@@ -23,8 +23,20 @@ export const create_channel_btn = doc.querySelector("#create-channel-button");
 
 // Servers
 export function create_server(id, name, image) {
-    server_list.innerHTML += `<img src="${image}" server_id="${id}" server_name="${name}" alt="${name}" title="${name}" onclick="window.app.open_server(${id})" />`;
-    return true;
+    // Create button
+    const button = doc.createElement("button");
+    button.setAttribute("server_id", id);
+    button.setAttribute("server_name", name);
+    button.setAttribute("alt", name);
+    button.setAttribute("title", name);
+
+    // And image
+    const img = doc.createElement("img");
+    img.src = image;
+    button.appendChild(img);
+
+    server_list.appendChild(button);
+    return button;
 }
 
 export function change_server(id, name, image) {
@@ -107,7 +119,7 @@ export function create_message(message) {
     const user_link = `/app/user/${message.author.username}`;
 
     const datetime = new Date(message.time * 1000);
-    const timestamp = datetime.toLocaleString();
+    const timestamp = datetime.toLocaleTimeString('en-GB');
 
     // Create the message
     const container = doc.createElement("div");
